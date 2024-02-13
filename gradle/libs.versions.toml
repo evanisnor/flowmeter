@@ -9,7 +9,6 @@ activityCompose = "1.8.2"
 composeBom = "2024.02.00"
 circuit = "0.19.1"
 
-
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -22,7 +21,16 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-circuit = { group = "com.slack.circuit", name = "circuit-foundation", version.ref = "circuit" }
+circuit-foundation = { group = "com.slack.circuit", name = "circuit-foundation", version.ref = "circuit" }
+circuit-overlay = { group = "com.slack.circuit", name = "circuit-overlay", version.ref = "circuit" }
+circuit-retained = { group = "com.slack.circuit", name = "circuit-retained", version.ref = "circuit" }
+
+[bundles]
+circuit = [
+    "circuit-foundation",
+    "circuit-overlay",
+    "circuit-retained"
+]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
