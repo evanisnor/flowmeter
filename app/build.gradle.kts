@@ -1,5 +1,6 @@
 plugins {
   alias(libs.plugins.android.application)
+  alias(libs.plugins.jetbrains.kotlin.kapt)
   alias(libs.plugins.jetbrains.kotlin.android)
   alias(libs.plugins.anvil)
 }
@@ -56,6 +57,8 @@ dependencies {
   implementation(libs.androidx.ui.tooling.preview)
   implementation(libs.androidx.material3)
   implementation(libs.bundles.circuit)
+  implementation(libs.dagger)
+  kapt(libs.dagger.compiler)
 
   testImplementation(libs.junit)
 

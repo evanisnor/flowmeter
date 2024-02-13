@@ -9,6 +9,7 @@ activityCompose = "1.8.2"
 composeBom = "2024.02.00"
 circuit = "0.19.1"
 anvil = "2.4.9"
+dagger = "2.50"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +26,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 circuit-foundation = { group = "com.slack.circuit", name = "circuit-foundation", version.ref = "circuit" }
 circuit-overlay = { group = "com.slack.circuit", name = "circuit-overlay", version.ref = "circuit" }
 circuit-retained = { group = "com.slack.circuit", name = "circuit-retained", version.ref = "circuit" }
+dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger"}
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger"}
 
 [bundles]
 circuit = [
@@ -35,6 +38,7 @@ circuit = [
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 anvil = { id = "com.squareup.anvil", version.ref="anvil" }
 
