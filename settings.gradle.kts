@@ -19,5 +19,5 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "pomodoro"
+rootProject.name = "flowmeter"
 include(":app")

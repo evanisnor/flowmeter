@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-  namespace = "com.evanisnor.pomodoro"
+  namespace = "com.evanisnor.flowmeter"
   compileSdk = 34
 
   defaultConfig {
-    applicationId = "com.evanisnor.pomodoro"
+    applicationId = "com.evanisnor.flowmeter"
     minSdk = 29
     targetSdk = 34
     versionCode = 1

@@ -1,4 +1,4 @@
-package com.evanisnor.pomodoro.ui.theme
+package com.evanisnor.flowmeter.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
