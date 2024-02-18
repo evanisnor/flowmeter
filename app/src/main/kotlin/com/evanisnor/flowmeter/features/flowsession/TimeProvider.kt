@@ -2,6 +2,7 @@ package com.evanisnor.flowmeter.features.flowsession
 
 import androidx.annotation.VisibleForTesting
 import java.time.Instant
+import kotlin.time.Duration.Companion.minutes
 
 interface TimeProvider {
   fun now() : Instant
@@ -20,5 +21,9 @@ class FakeTimeProvider(
 
   fun setSeconds(seconds: Int) {
     now = Instant.ofEpochSecond(seconds.toLong())
+  }
+
+  fun setMinutes(minutes: Int) {
+    now = Instant.ofEpochSecond(minutes.minutes.inWholeSeconds)
   }
 }

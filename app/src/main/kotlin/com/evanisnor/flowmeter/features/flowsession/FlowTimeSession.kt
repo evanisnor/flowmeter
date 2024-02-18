@@ -63,9 +63,8 @@ class FlowTimeSessionLogic(
     this < 25.minutes -> 5.minutes
     this < 50.minutes -> 8.minutes
     this < 90.minutes -> 10.minutes
-    this < 90.minutes -> 15.minutes
-    this >= 120.minutes -> 20.minutes
-    else -> 0.minutes
+    this < 120.minutes -> 15.minutes
+    else -> 20.minutes
   }
 
 }

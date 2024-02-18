@@ -58,13 +58,84 @@ class FlowTimeSessionTest {
       awaitItem()
       timeProvider.setSeconds(101)
       awaitItem()
-      timeProvider.setSeconds(102)
 
       flowSession.stop()
       assertThat(awaitItem()).isEqualTo(
         Complete(
           sessionDuration = 1.seconds,
           recommendedBreak = 5.minutes,
+        )
+      )
+      awaitComplete()
+    }
+  }
+
+  @Test
+  fun `session - when duration is 25 minutes - recommends an 8 minute break`() = runTest {
+    flowSession.test {
+      awaitItem()
+      timeProvider.setMinutes(25)
+      awaitItem()
+
+      flowSession.stop()
+      assertThat(awaitItem()).isEqualTo(
+        Complete(
+          sessionDuration = 25.minutes,
+          recommendedBreak = 8.minutes,
+        )
+      )
+      awaitComplete()
+    }
+  }
+
+  @Test
+  fun `session - when duration is 50 minutes - recommends a 10 minute break`() = runTest {
+    flowSession.test {
+      awaitItem()
+      timeProvider.setMinutes(50)
+      awaitItem()
+
+      flowSession.stop()
+      assertThat(awaitItem()).isEqualTo(
+        Complete(
+          sessionDuration = 50.minutes,
+          recommendedBreak = 10.minutes,
+        )
+      )
+      awaitComplete()
+    }
+  }
+
+  @Test
+  fun `session - when duration is 90 minutes - recommends a 15 minute break`() = runTest {
+    flowSession.test {
+      awaitItem()
+      timeProvider.setMinutes(90)
+      awaitItem()
+
+      flowSession.stop()
+      assertThat(awaitItem()).isEqualTo(
+        Complete(
+          sessionDuration = 90.minutes,
+          recommendedBreak = 15.minutes,
+        )
+      )
+      awaitComplete()
+    }
+  }
+
+  @Test
+  fun `session - when duration is 120 minutes - recommends a 20 minute break`() = runTest {
+    flowSession.test {
+      awaitItem()
+      timeProvider.setMinutes(120)
+      awaitItem()
+
+      flowSession.stop()
+      assertThat(awaitItem()).isEqualTo(
+        Complete(
+          sessionDuration = 120.minutes,
+          recommendedBreak = 20.minutes,
         )
       )
       awaitComplete()
