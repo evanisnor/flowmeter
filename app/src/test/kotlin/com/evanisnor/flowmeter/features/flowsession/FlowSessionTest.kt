@@ -22,7 +22,7 @@ class FlowSessionTest {
   fun `session - when collecting - emits Ticks over time`() = runTest {
     timeProvider.setSeconds(100)
 
-    flowSession.session().test {
+    flowSession.test {
       assertThat(awaitItem()).isEqualTo(Tick(0.seconds))
       timeProvider.setSeconds(101)
       assertThat(awaitItem()).isEqualTo(Tick(1.seconds))
@@ -38,13 +38,14 @@ class FlowSessionTest {
     timeProvider.setSeconds(100)
     flowSession.stop()
 
-    flowSession.session().test {
+    flowSession.test {
       assertThat(awaitItem()).isEqualTo(
         Complete(
           totalDuration = 0.seconds,
           recommendedBreak = 0.seconds,
         )
       )
+      awaitComplete()
     }
   }
 
