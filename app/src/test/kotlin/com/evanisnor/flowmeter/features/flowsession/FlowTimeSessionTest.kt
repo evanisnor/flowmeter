@@ -1,8 +1,8 @@
 package com.evanisnor.flowmeter.features.flowsession
 
 import app.cash.turbine.test
-import com.evanisnor.flowmeter.features.flowsession.FlowSession.State.Complete
-import com.evanisnor.flowmeter.features.flowsession.FlowSession.State.Tick
+import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State.Complete
+import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State.Tick
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -10,12 +10,12 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Test for [FlowSession]
+ * Test for [FlowTimeSession]
  */
-class FlowSessionTest {
+class FlowTimeSessionTest {
 
   private val timeProvider = FakeTimeProvider()
-  private val flowSession = FlowSessionLogic(
+  private val flowSession = FlowTimeSessionLogic(
     timeProvider = timeProvider
   )
 

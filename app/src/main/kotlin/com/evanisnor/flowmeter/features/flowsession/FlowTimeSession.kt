@@ -1,8 +1,8 @@
 package com.evanisnor.flowmeter.features.flowsession
 
-import com.evanisnor.flowmeter.features.flowsession.FlowSession.State
-import com.evanisnor.flowmeter.features.flowsession.FlowSession.State.Complete
-import com.evanisnor.flowmeter.features.flowsession.FlowSession.State.Tick
+import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State
+import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State.Complete
+import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State.Tick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Flow tracking session!
  */
-interface FlowSession : Flow<State> {
+interface FlowTimeSession : Flow<State> {
 
   sealed interface State {
     data class Tick(val duration: Duration) : State
@@ -30,11 +30,12 @@ interface FlowSession : Flow<State> {
 }
 
 /**
- * Doing a [FlowSession]
+ * Doing a [FlowTimeSession]. Based on "Flow Time"
+ * https://www.insightful.io/blog/flowtime-pomodoro-alternative
  */
-class FlowSessionLogic(
+class FlowTimeSessionLogic(
   private val timeProvider: TimeProvider = RealTimeProvider(),
-) : FlowSession {
+) : FlowTimeSession {
 
   private val isRunning: AtomicBoolean = AtomicBoolean(true)
 
