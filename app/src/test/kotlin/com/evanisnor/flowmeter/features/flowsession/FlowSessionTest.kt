@@ -6,6 +6,7 @@ import com.evanisnor.flowmeter.features.flowsession.FlowSession.State.Tick
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -41,8 +42,29 @@ class FlowSessionTest {
     flowSession.test {
       assertThat(awaitItem()).isEqualTo(
         Complete(
-          totalDuration = 0.seconds,
-          recommendedBreak = 0.seconds,
+          sessionDuration = 0.seconds,
+          recommendedBreak = 5.minutes,
+        )
+      )
+      awaitComplete()
+    }
+  }
+
+  @Test
+  fun `session - when collecting before stopping - emits Complete`() = runTest {
+    timeProvider.setSeconds(100)
+
+    flowSession.test {
+      awaitItem()
+      timeProvider.setSeconds(101)
+      awaitItem()
+      timeProvider.setSeconds(102)
+
+      flowSession.stop()
+      assertThat(awaitItem()).isEqualTo(
+        Complete(
+          sessionDuration = 1.seconds,
+          recommendedBreak = 5.minutes,
         )
       )
       awaitComplete()
