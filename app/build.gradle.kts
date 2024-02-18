@@ -62,6 +62,9 @@ dependencies {
   kapt(libs.dagger.compiler)
 
   testImplementation(libs.junit)
+  testImplementation(libs.turbine)
+  testImplementation(libs.truth)
+  testImplementation(libs.kotlin.coroutines.test)
 
   debugImplementation(libs.androidx.ui.tooling)
   debugImplementation(libs.androidx.ui.test.manifest)

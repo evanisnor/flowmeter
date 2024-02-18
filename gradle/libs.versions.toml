@@ -10,6 +10,8 @@ composeBom = "2024.02.00"
 circuit = "0.19.1"
 anvil = "2.4.9"
 dagger = "2.50"
+turbine = "1.0.0"
+truth = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +30,9 @@ circuit-overlay = { group = "com.slack.circuit", name = "circuit-overlay", versi
 circuit-retained = { group = "com.slack.circuit", name = "circuit-retained", version.ref = "circuit" }
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger"}
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine"}
+truth = { group = "com.google.truth", name = "truth", version.ref = "truth"}
+kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-test", version="kotlin" }
 
 [bundles]
 circuit = [
