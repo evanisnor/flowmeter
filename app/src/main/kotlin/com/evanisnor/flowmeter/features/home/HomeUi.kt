@@ -21,9 +21,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionCompleteUi
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionComplete
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionInProgress
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.StartNew
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionInProgress
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
 import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionInProgressUi
 import com.evanisnor.flowmeter.features.flowtimesession.ui.StartNewUi
 import com.evanisnor.flowmeter.features.home.HomeScreen.State

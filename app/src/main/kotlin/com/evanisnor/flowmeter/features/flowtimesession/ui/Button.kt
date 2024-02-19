@@ -1,4 +1,4 @@
-package com.evanisnor.flowmeter.features.flowtimesession.ui.components
+package com.evanisnor.flowmeter.features.flowtimesession.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding

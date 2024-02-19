@@ -5,9 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.evanisnor.flowmeter.features.flowtimesession.ui.components.NewSessionButton
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.StartNew
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent.NewSession
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.NewSession
 
 @Composable
 fun StartNewUi(state: StartNew, modifier: Modifier = Modifier) {

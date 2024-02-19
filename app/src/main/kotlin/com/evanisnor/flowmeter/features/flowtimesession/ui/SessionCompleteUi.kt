@@ -16,9 +16,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.evanisnor.flowmeter.features.flowtimesession.ui.components.NewSessionButton
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionComplete
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent.NewSession
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.NewSession
 import kotlin.time.Duration.Companion.minutes
 
 

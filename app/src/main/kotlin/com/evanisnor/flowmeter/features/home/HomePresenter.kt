@@ -2,7 +2,7 @@ package com.evanisnor.flowmeter.features.home
 
 import androidx.compose.runtime.Composable
 import com.evanisnor.flowmeter.di.AppScope
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContentPresenter
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContentPresenter
 import com.evanisnor.flowmeter.features.home.HomeScreen.Event
 import com.evanisnor.flowmeter.features.home.HomeScreen.State
 import com.slack.circuit.codegen.annotations.CircuitInject

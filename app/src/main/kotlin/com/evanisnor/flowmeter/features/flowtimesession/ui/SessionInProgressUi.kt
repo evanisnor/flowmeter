@@ -10,9 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.evanisnor.flowmeter.features.flowtimesession.ui.components.StopSessionButton
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionInProgress
-import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent.EndSession
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionInProgress
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.EndSession
 
 
 @Composable
