@@ -32,6 +32,11 @@ interface FlowTimeSession : Flow<State> {
 
 }
 
+object NoOpFlowTimeSession : FlowTimeSession {
+  override suspend fun collect(collector: FlowCollector<State>) = Unit
+  override fun stop() = Unit
+}
+
 /**
  * Doing a [FlowTimeSession]. Based on "Flow Time"
  * https://www.insightful.io/blog/flowtime-pomodoro-alternative

@@ -9,27 +9,36 @@ import kotlin.time.Duration
 @Parcelize
 data object FlowTimeScreen : Screen {
 
-  sealed interface State : CircuitUiState {
+  data class State(
+    val content: Content,
     val eventSink: (Event) -> Unit
+  ) : CircuitUiState {
 
-    data class StartNew(
-      override val eventSink: (Event) -> Unit,
-    ) : State
+    sealed interface Content {
+      val eventSink : (SessionEvent) -> Unit
 
-    data class SessionInProgress(
-      val duration: String,
-      override val eventSink: (Event) -> Unit,
-    ) : State
+      data class StartNew(
+        override val eventSink: (SessionEvent) -> Unit,
+      ): Content
 
-    data class SessionComplete(
-      val duration: String,
-      val breakRecommendation: Duration,
-      override val eventSink: (Event) -> Unit,
-    ) : State
+      data class SessionInProgress(
+        val duration: String,
+        override val eventSink: (SessionEvent) -> Unit,
+      ) : Content
+
+      data class SessionComplete(
+        val duration: String,
+        val breakRecommendation: Duration,
+        override val eventSink: (SessionEvent) -> Unit,
+      ) : Content
+
+
+      interface SessionEvent : CircuitUiEvent {
+        data object NewSession : SessionEvent
+        data object EndSession : SessionEvent
+      }
+    }
   }
 
-  interface Event : CircuitUiEvent {
-    data object NewSession : Event
-    data object EndSession : Event
-  }
+  interface Event : CircuitUiEvent
 }

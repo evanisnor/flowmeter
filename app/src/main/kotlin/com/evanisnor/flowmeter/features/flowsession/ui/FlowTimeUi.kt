@@ -36,12 +36,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.di.AppScope
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.Event.EndSession
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.Event.NewSession
+import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionEvent.EndSession
+import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionEvent.NewSession
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.SessionComplete
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.SessionInProgress
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.StartNew
+import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionComplete
+import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionInProgress
+import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.StartNew
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 import kotlin.time.Duration.Companion.minutes
@@ -72,10 +72,10 @@ fun FlowTimeUi(state: State, modifier: Modifier = Modifier) {
       val screenModifier = modifier
         .padding(innerPadding)
         .fillMaxSize()
-      when (state) {
-        is StartNew -> StartNewUi(state = state, modifier = screenModifier)
-        is SessionComplete -> SessionCompleteUi(state = state, modifier = screenModifier)
-        is SessionInProgress -> SessionInProgressUi(state = state, modifier = screenModifier)
+      when (state.content) {
+        is StartNew -> StartNewUi(state = state.content, modifier = screenModifier)
+        is SessionComplete -> SessionCompleteUi(state = state.content, modifier = screenModifier)
+        is SessionInProgress -> SessionInProgressUi(state = state.content, modifier = screenModifier)
       }
     }
   }
@@ -97,7 +97,7 @@ private fun StartNewUi(state: StartNew, modifier: Modifier = Modifier) {
 @PreviewLightDark
 @Composable
 private fun StartNewPreview() {
-  FlowTimeUi(state = StartNew(eventSink = {}))
+  StartNewUi(state = StartNew(eventSink = {}))
 }
 
 // endregion
@@ -128,7 +128,7 @@ private fun SessionInProgressUi(state: SessionInProgress, modifier: Modifier = M
 @PreviewLightDark
 @Composable
 private fun SessionInProgressPreview() {
-  FlowTimeUi(
+  SessionInProgressUi(
     state = SessionInProgress(
       duration = "1:10:13",
       eventSink = {},
@@ -188,7 +188,7 @@ private fun SessionCompleteUi(state: SessionComplete, modifier: Modifier = Modif
 @PreviewLightDark
 @Composable
 private fun SessionCompletePreview() {
-  FlowTimeUi(
+  SessionCompleteUi(
     state = SessionComplete(
       duration = "1 hour and 24 minutes",
       breakRecommendation = 10.minutes,
