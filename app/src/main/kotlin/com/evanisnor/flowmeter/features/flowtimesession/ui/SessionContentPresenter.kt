@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Provider
 
-class FlowTimeSessionContentPresenter @Inject constructor(
+class SessionContentPresenter @Inject constructor(
   private val flowTimeSessionProvider: Provider<FlowTimeSession>,
 ) : Presenter<SessionContent> {
 
