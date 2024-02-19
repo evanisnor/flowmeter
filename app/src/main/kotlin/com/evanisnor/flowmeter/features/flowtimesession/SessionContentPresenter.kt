@@ -42,7 +42,7 @@ class SessionContentPresenter @Inject constructor(
         is NewSession -> {
           takingABreak.value = false
           session.value = flowTimeSessionProvider.get()
-          attentionGrabber.playSessionStartNoise()
+          attentionGrabber.notifySessionStarted()
         }
         is EndSession -> {
           session.value.stop()
@@ -65,7 +65,7 @@ class SessionContentPresenter @Inject constructor(
           value = if (takingABreak.value) {
             flowTimeState.toBreakContent(breakRecommendation.value, eventSink).also {
               if (it is SessionContent.TakingABreak && it.isBreakLongerThanRecommended) {
-                attentionGrabber.playBreakEndNoise()
+                attentionGrabber.notifyRecommendedBreakIsOver()
               }
             }
           } else {

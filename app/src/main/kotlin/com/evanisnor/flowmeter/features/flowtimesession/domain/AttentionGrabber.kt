@@ -10,11 +10,11 @@ class AttentionGrabber @Inject constructor(
   private val ringtoneManager: RingtoneManager,
 ) {
 
-  fun playSessionStartNoise() {
+  fun notifySessionStarted() {
     ringtoneManager.getRingtone(RingtoneManager.TYPE_NOTIFICATION).play()
   }
 
-  fun playBreakEndNoise() {
+  fun notifyRecommendedBreakIsOver() {
     ringtoneManager.getRingtone(RingtoneManager.TYPE_NOTIFICATION).play()
   }
 
