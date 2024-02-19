@@ -30,7 +30,7 @@ interface SessionRepository {
 /**
  * Database implementation for [SessionRepository]
  */
-@ContributesBinding(SessionRepository::class, AppScope::class)
+@ContributesBinding(AppScope::class, SessionRepository::class)
 class SessionRepositoryDatabase @Inject constructor(
   database: Database,
   private val zoneOffset: ZoneOffset,
