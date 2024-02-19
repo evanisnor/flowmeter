@@ -1,17 +1,17 @@
-package com.evanisnor.flowmeter.features.flowsession.ui
+package com.evanisnor.flowmeter.features.flowtimesession.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
-import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession
-import com.evanisnor.flowmeter.features.flowsession.domain.NoOpFlowTimeSession
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.EndSession
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.NewSession
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionComplete
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionInProgress
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.StartNew
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession
+import com.evanisnor.flowmeter.features.flowtimesession.domain.NoOpFlowTimeSession
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent.EndSession
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent.NewSession
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionComplete
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionInProgress
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.StartNew
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter

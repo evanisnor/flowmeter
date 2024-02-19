@@ -1,10 +1,10 @@
-package com.evanisnor.flowmeter.features.flowsession
+package com.evanisnor.flowmeter.features.flowtimesession
 
 import app.cash.turbine.test
-import com.evanisnor.flowmeter.features.flowsession.domain.FakeTimeProvider
-import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Complete
-import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Tick
-import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSessionLogic
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FakeTimeProvider
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Complete
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Tick
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionLogic
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Test

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.evanisnor.flowmeter.features.flowsession.ui
+package com.evanisnor.flowmeter.features.flowtimesession.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,12 +37,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.home.HomeScreen
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.EndSession
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.NewSession
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent.EndSession
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionEvent.NewSession
 import com.evanisnor.flowmeter.features.home.HomeScreen.State
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionComplete
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionInProgress
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.StartNew
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionComplete
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.SessionInProgress
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent.StartNew
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 import kotlin.time.Duration.Companion.minutes

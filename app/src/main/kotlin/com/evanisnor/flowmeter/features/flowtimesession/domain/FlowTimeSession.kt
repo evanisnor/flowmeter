@@ -1,9 +1,9 @@
-package com.evanisnor.flowmeter.features.flowsession.domain
+package com.evanisnor.flowmeter.features.flowtimesession.domain
 
 import com.evanisnor.flowmeter.di.AppScope
-import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State
-import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Complete
-import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Tick
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Complete
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Tick
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

@@ -1,4 +1,4 @@
-package com.evanisnor.flowmeter.features.flowsession.domain
+package com.evanisnor.flowmeter.features.flowtimesession.domain
 
 import androidx.annotation.VisibleForTesting
 import com.evanisnor.flowmeter.di.AppScope

@@ -1,6 +1,6 @@
 package com.evanisnor.flowmeter.features.home
 
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent
+import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionContent
 import com.slack.circuit.runtime.CircuitUiEvent
 import com.slack.circuit.runtime.CircuitUiState
 import com.slack.circuit.runtime.screen.Screen

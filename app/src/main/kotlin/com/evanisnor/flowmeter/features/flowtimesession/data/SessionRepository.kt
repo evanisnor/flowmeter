@@ -1,8 +1,8 @@
-package com.evanisnor.flowmeter.features.flowsession.data
+package com.evanisnor.flowmeter.features.flowtimesession.data
 
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.Database
-import com.evanisnor.flowmeter.features.flowsession.data.SessionRepository.Session
+import com.evanisnor.flowmeter.features.flowtimesession.data.SessionRepository.Session
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.LocalDateTime
 import java.time.ZoneOffset

@@ -1,4 +1,4 @@
-package com.evanisnor.flowmeter.features.flowsession.ui
+package com.evanisnor.flowmeter.features.flowtimesession.ui
 
 import com.slack.circuit.runtime.CircuitUiEvent
 import com.slack.circuit.runtime.CircuitUiState

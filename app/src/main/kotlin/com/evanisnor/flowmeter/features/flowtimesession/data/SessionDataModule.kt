@@ -1,4 +1,4 @@
-package com.evanisnor.flowmeter.features.flowsession.data
+package com.evanisnor.flowmeter.features.flowtimesession.data
 
 import android.content.Context
 import app.cash.sqldelight.db.SqlDriver
