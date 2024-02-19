@@ -30,8 +30,6 @@ interface FlowTimeSession : Flow<State> {
 
   fun stop()
 
-  fun reset()
-
 }
 
 /**
@@ -63,10 +61,6 @@ class FlowTimeSessionLogic @Inject constructor(
 
   override fun stop() {
     isRunning.set(false)
-  }
-
-  override fun reset() {
-    isRunning.set(true)
   }
 
   private fun Duration.recommendedBreak(): Duration = when {

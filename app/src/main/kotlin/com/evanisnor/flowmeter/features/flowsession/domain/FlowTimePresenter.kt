@@ -22,16 +22,18 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Provider
 
 @CircuitInject(FlowTimeScreen::class, AppScope::class)
 class FlowTimePresenter @Inject constructor(
   private val scope: CoroutineScope,
-  private val flowTimeSession: FlowTimeSession,
+  private val flowTimeSessionProvider: Provider<FlowTimeSession>,
 ) : Presenter<State> {
 
   @Composable
   override fun present(): State {
     val latestEvent = rememberRetained { mutableStateOf<Event?>(null) }
+    val session = rememberRetained { mutableStateOf<FlowTimeSession?>(null) }
 
     val eventSink: (Event) -> Unit = { event -> latestEvent.value = event }
 
@@ -39,9 +41,10 @@ class FlowTimePresenter @Inject constructor(
       snapshotFlow { latestEvent.value }.collectLatest {
         when (it) {
           is NewSession -> {
+            session.value = flowTimeSessionProvider.get()
             scope.launch {
 
-              flowTimeSession.collectLatest { flowTimeState ->
+              session.value?.collectLatest { flowTimeState ->
                 value = when (flowTimeState) {
                   is FlowTimeSession.State.Tick -> {
                     SessionInProgress(
@@ -55,7 +58,6 @@ class FlowTimePresenter @Inject constructor(
                       breakRecommendation = flowTimeState.recommendedBreak,
                       eventSink = eventSink,
                     ).also {
-                      flowTimeSession.reset()
                       cancel()
                     }
                   }
@@ -64,7 +66,7 @@ class FlowTimePresenter @Inject constructor(
             }
           }
           is EndSession -> {
-            flowTimeSession.stop()
+            session.value?.stop()
           }
         }
       }
