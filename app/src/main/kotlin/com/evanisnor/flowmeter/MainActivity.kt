@@ -8,7 +8,7 @@ import com.evanisnor.flowmeter.di.ActivityKey
 import com.evanisnor.flowmeter.di.AnvilInjector
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.InjectWith
-import com.evanisnor.flowmeter.features.home.FlowTimeScreen
+import com.evanisnor.flowmeter.features.home.HomeScreen
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitCompositionLocals
 import com.slack.circuit.foundation.CircuitContent
@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
     setContent {
       CircuitCompositionLocals(circuit = circuit) {
-        CircuitContent(FlowTimeScreen)
+        CircuitContent(HomeScreen)
       }
     }
   }

@@ -36,10 +36,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.di.AppScope
-import com.evanisnor.flowmeter.features.home.FlowTimeScreen
+import com.evanisnor.flowmeter.features.home.HomeScreen
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.EndSession
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.NewSession
-import com.evanisnor.flowmeter.features.home.FlowTimeScreen.State
+import com.evanisnor.flowmeter.features.home.HomeScreen.State
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionInProgress
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.StartNew
@@ -47,9 +47,9 @@ import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 import kotlin.time.Duration.Companion.minutes
 
-@CircuitInject(FlowTimeScreen::class, AppScope::class)
+@CircuitInject(HomeScreen::class, AppScope::class)
 @Composable
-fun FlowTimeUi(state: State, modifier: Modifier = Modifier) {
+fun HomeUi(state: State, modifier: Modifier = Modifier) {
   FlowmeterTheme {
     Scaffold(
       topBar = {

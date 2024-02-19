@@ -3,14 +3,14 @@ package com.evanisnor.flowmeter.features.home
 import androidx.compose.runtime.Composable
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeSessionContentPresenter
-import com.evanisnor.flowmeter.features.home.FlowTimeScreen.Event
-import com.evanisnor.flowmeter.features.home.FlowTimeScreen.State
+import com.evanisnor.flowmeter.features.home.HomeScreen.Event
+import com.evanisnor.flowmeter.features.home.HomeScreen.State
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.runtime.presenter.Presenter
 import javax.inject.Inject
 
-@CircuitInject(FlowTimeScreen::class, AppScope::class)
-class FlowTimePresenter @Inject constructor(
+@CircuitInject(HomeScreen::class, AppScope::class)
+class HomePresenter @Inject constructor(
   private val contentPresenter: FlowTimeSessionContentPresenter
 ) : Presenter<State> {
 

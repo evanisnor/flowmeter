@@ -7,7 +7,7 @@ import com.slack.circuit.runtime.screen.Screen
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data object FlowTimeScreen : Screen {
+data object HomeScreen : Screen {
 
   data class State(
     val sessionContent: SessionContent,
