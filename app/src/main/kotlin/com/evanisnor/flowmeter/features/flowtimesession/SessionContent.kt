@@ -22,9 +22,18 @@ sealed interface SessionContent : CircuitUiState {
     override val eventSink: (SessionEvent) -> Unit,
   ) : SessionContent
 
+  data class TakingABreak(
+    val duration: String,
+    val breakRecommendation: Duration,
+    val isBreakLongerThanRecommended: Boolean,
+    override val eventSink: (SessionEvent) -> Unit,
+  ) : SessionContent
+
 
   interface SessionEvent : CircuitUiEvent {
     data object NewSession : SessionEvent
     data object EndSession : SessionEvent
+    data class TakeABreak(val duration: Duration) : SessionEvent
+    data object EndBreak : SessionEvent
   }
 }

@@ -3,6 +3,8 @@ package com.evanisnor.flowmeter.features.flowtimesession.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,6 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.NewSession
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.TakeABreak
 import kotlin.time.Duration.Companion.minutes
 
 
@@ -47,21 +50,14 @@ fun SessionCompleteUi(state: SessionComplete, modifier: Modifier = Modifier) {
         },
         style = MaterialTheme.typography.headlineMedium
       )
-      Text(
-        modifier = Modifier.width(300.dp),
-        textAlign = TextAlign.Center,
-        text = buildAnnotatedString {
-          append("Take a ")
-          withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-            append(state.breakRecommendation.inWholeMinutes.toString())
-          }
-          append(" minute break")
-        },
-        style = MaterialTheme.typography.bodyMedium
-      )
+
+      TakeABreakButton(
+        duration = state.breakRecommendation,
+        onClick = { state.eventSink(TakeABreak(state.breakRecommendation)) })
       NewSessionButton(
         onClick = { state.eventSink(NewSession) },
       )
+
     }
   }
 }

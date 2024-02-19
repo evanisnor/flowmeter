@@ -23,9 +23,11 @@ import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionCompleteUi
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionInProgress
+import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.TakingABreak
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
 import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionInProgressUi
 import com.evanisnor.flowmeter.features.flowtimesession.ui.StartNewUi
+import com.evanisnor.flowmeter.features.flowtimesession.ui.TakingABreakUi
 import com.evanisnor.flowmeter.features.home.HomeScreen.State
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
@@ -60,6 +62,7 @@ fun HomeUi(state: State, modifier: Modifier = Modifier) {
         is StartNew -> StartNewUi(state = state.sessionContent, modifier = screenModifier)
         is SessionComplete -> SessionCompleteUi(state = state.sessionContent, modifier = screenModifier)
         is SessionInProgress -> SessionInProgressUi(state = state.sessionContent, modifier = screenModifier)
+        is TakingABreak -> TakingABreakUi(state = state.sessionContent, modifier = screenModifier)
       }
     }
   }

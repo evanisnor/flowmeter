@@ -28,7 +28,7 @@ fun SessionInProgressUi(state: SessionInProgress, modifier: Modifier = Modifier)
         text = state.duration,
         style = MaterialTheme.typography.displayLarge
       )
-      StopSessionButton(
+      StopButton(
         onClick = { state.eventSink(EndSession) },
       )
     }
