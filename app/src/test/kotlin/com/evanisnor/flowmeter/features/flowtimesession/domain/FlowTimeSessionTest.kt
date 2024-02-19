@@ -1,11 +1,7 @@
-package com.evanisnor.flowmeter.features.flowtimesession
+package com.evanisnor.flowmeter.features.flowtimesession.domain
 
 import app.cash.turbine.test
-import com.evanisnor.flowmeter.features.flowtimesession.domain.FakeTimeProvider
-import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Complete
-import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Tick
-import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionLogic
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.time.Duration.Companion.minutes
@@ -26,11 +22,11 @@ class FlowTimeSessionTest {
     timeProvider.setSeconds(100)
 
     flowSession.test {
-      assertThat(awaitItem()).isEqualTo(Tick(0.seconds))
+      Truth.assertThat(awaitItem()).isEqualTo(FlowTimeSession.State.Tick(0.seconds))
       timeProvider.setSeconds(101)
-      assertThat(awaitItem()).isEqualTo(Tick(1.seconds))
+      Truth.assertThat(awaitItem()).isEqualTo(FlowTimeSession.State.Tick(1.seconds))
       timeProvider.setSeconds(102)
-      assertThat(awaitItem()).isEqualTo(Tick(2.seconds))
+      Truth.assertThat(awaitItem()).isEqualTo(FlowTimeSession.State.Tick(2.seconds))
 
       cancelAndIgnoreRemainingEvents()
     }
@@ -42,8 +38,8 @@ class FlowTimeSessionTest {
     flowSession.stop()
 
     flowSession.test {
-      assertThat(awaitItem()).isEqualTo(
-        Complete(
+      Truth.assertThat(awaitItem()).isEqualTo(
+        FlowTimeSession.State.Complete(
           sessionDuration = 0.seconds,
           recommendedBreak = 5.minutes,
         )
@@ -62,8 +58,8 @@ class FlowTimeSessionTest {
       awaitItem()
 
       flowSession.stop()
-      assertThat(awaitItem()).isEqualTo(
-        Complete(
+      Truth.assertThat(awaitItem()).isEqualTo(
+        FlowTimeSession.State.Complete(
           sessionDuration = 1.seconds,
           recommendedBreak = 5.minutes,
         )
@@ -80,8 +76,8 @@ class FlowTimeSessionTest {
       awaitItem()
 
       flowSession.stop()
-      assertThat(awaitItem()).isEqualTo(
-        Complete(
+      Truth.assertThat(awaitItem()).isEqualTo(
+        FlowTimeSession.State.Complete(
           sessionDuration = 25.minutes,
           recommendedBreak = 8.minutes,
         )
@@ -98,8 +94,8 @@ class FlowTimeSessionTest {
       awaitItem()
 
       flowSession.stop()
-      assertThat(awaitItem()).isEqualTo(
-        Complete(
+      Truth.assertThat(awaitItem()).isEqualTo(
+        FlowTimeSession.State.Complete(
           sessionDuration = 50.minutes,
           recommendedBreak = 10.minutes,
         )
@@ -116,8 +112,8 @@ class FlowTimeSessionTest {
       awaitItem()
 
       flowSession.stop()
-      assertThat(awaitItem()).isEqualTo(
-        Complete(
+      Truth.assertThat(awaitItem()).isEqualTo(
+        FlowTimeSession.State.Complete(
           sessionDuration = 90.minutes,
           recommendedBreak = 15.minutes,
         )
@@ -134,8 +130,8 @@ class FlowTimeSessionTest {
       awaitItem()
 
       flowSession.stop()
-      assertThat(awaitItem()).isEqualTo(
-        Complete(
+      Truth.assertThat(awaitItem()).isEqualTo(
+        FlowTimeSession.State.Complete(
           sessionDuration = 120.minutes,
           recommendedBreak = 20.minutes,
         )
