@@ -1,8 +1,8 @@
-package com.evanisnor.flowmeter.features.flowsession
+package com.evanisnor.flowmeter.features.flowsession.domain
 
-import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State
-import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State.Complete
-import com.evanisnor.flowmeter.features.flowsession.FlowTimeSession.State.Tick
+import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State
+import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Complete
+import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Tick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector

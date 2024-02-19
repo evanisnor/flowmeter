@@ -1,4 +1,4 @@
-package com.evanisnor.flowmeter.features.flowsession
+package com.evanisnor.flowmeter.features.flowsession.domain
 
 import androidx.annotation.VisibleForTesting
 import java.time.Instant
