@@ -36,9 +36,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.di.AppScope
+import com.evanisnor.flowmeter.features.home.FlowTimeScreen
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.EndSession
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.NewSession
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State
+import com.evanisnor.flowmeter.features.home.FlowTimeScreen.State
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionInProgress
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.StartNew

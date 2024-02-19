@@ -1,10 +1,10 @@
-package com.evanisnor.flowmeter.features.flowsession.domain
+package com.evanisnor.flowmeter.features.home
 
 import androidx.compose.runtime.Composable
 import com.evanisnor.flowmeter.di.AppScope
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.Event
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State
+import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeSessionContentPresenter
+import com.evanisnor.flowmeter.features.home.FlowTimeScreen.Event
+import com.evanisnor.flowmeter.features.home.FlowTimeScreen.State
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.runtime.presenter.Presenter
 import javax.inject.Inject

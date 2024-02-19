@@ -1,10 +1,11 @@
-package com.evanisnor.flowmeter.features.flowsession.domain
+package com.evanisnor.flowmeter.features.flowsession.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
-import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent
+import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession
+import com.evanisnor.flowmeter.features.flowsession.domain.NoOpFlowTimeSession
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.EndSession
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.NewSession
 import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent
