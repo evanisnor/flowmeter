@@ -7,7 +7,7 @@ class TimeFormatter @Inject constructor() {
 
   fun humanReadableClock(duration: Duration): String {
     return if (duration.inWholeHours > 0) {
-      "${duration.inWholeHours}:${duration.inWholeMinutes % 60}:${format(duration.inWholeSeconds % 60)}"
+      "${duration.inWholeHours}:${format(duration.inWholeMinutes % 60)}:${format(duration.inWholeSeconds % 60)}"
     } else {
       "${duration.inWholeMinutes}:${format(duration.inWholeSeconds % 60)}"
     }
