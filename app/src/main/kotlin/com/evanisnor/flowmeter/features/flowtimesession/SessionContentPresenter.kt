@@ -14,6 +14,7 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionIn
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession
 import com.evanisnor.flowmeter.features.flowtimesession.domain.NoOpFlowTimeSession
+import com.evanisnor.flowmeter.features.flowtimesession.domain.AttentionGrabber
 import com.evanisnor.flowmeter.features.flowtimesession.domain.TimeFormatter
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
@@ -27,6 +28,7 @@ import kotlin.time.Duration.Companion.minutes
 class SessionContentPresenter @Inject constructor(
   private val flowTimeSessionProvider: Provider<FlowTimeSession>,
   private val timeFormatter: TimeFormatter,
+  private val attentionGrabber: AttentionGrabber,
 ) : Presenter<SessionContent> {
 
   @Composable
@@ -40,6 +42,7 @@ class SessionContentPresenter @Inject constructor(
         is NewSession -> {
           takingABreak.value = false
           session.value = flowTimeSessionProvider.get()
+          attentionGrabber.playSessionStartNoise()
         }
         is EndSession -> {
           session.value.stop()
@@ -57,10 +60,14 @@ class SessionContentPresenter @Inject constructor(
     }
 
     val sessionContent by produceRetainedState<SessionContent>(initialValue = StartNew(eventSink)) {
-      snapshotFlow { session.value }.collectLatest {
-        it.collect { flowTimeState ->
+      snapshotFlow { session.value }.collectLatest {session ->
+        session.collect { flowTimeState ->
           value = if (takingABreak.value) {
-            flowTimeState.toBreakContent(breakRecommendation.value, eventSink)
+            flowTimeState.toBreakContent(breakRecommendation.value, eventSink).also {
+              if (it is SessionContent.TakingABreak && it.isBreakLongerThanRecommended) {
+                attentionGrabber.playBreakEndNoise()
+              }
+            }
           } else {
             flowTimeState.toSessionContent(eventSink)
           }
