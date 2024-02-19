@@ -1,14 +1,18 @@
 package com.evanisnor.flowmeter.features.flowsession.domain
 
 import androidx.annotation.VisibleForTesting
+import com.evanisnor.flowmeter.di.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Instant
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
 interface TimeProvider {
   fun now() : Instant
 }
 
-class RealTimeProvider : TimeProvider {
+@ContributesBinding(AppScope::class, TimeProvider::class)
+class RealTimeProvider @Inject constructor() : TimeProvider {
   override fun now(): Instant = Instant.now()
 }
 

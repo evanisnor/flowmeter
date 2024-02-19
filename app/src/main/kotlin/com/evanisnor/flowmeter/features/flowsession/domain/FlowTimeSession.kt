@@ -1,12 +1,15 @@
 package com.evanisnor.flowmeter.features.flowsession.domain
 
+import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State
 import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Complete
 import com.evanisnor.flowmeter.features.flowsession.domain.FlowTimeSession.State.Tick
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -27,14 +30,17 @@ interface FlowTimeSession : Flow<State> {
 
   fun stop()
 
+  fun reset()
+
 }
 
 /**
  * Doing a [FlowTimeSession]. Based on "Flow Time"
  * https://www.insightful.io/blog/flowtime-pomodoro-alternative
  */
-class FlowTimeSessionLogic(
-  private val timeProvider: TimeProvider = RealTimeProvider(),
+@ContributesBinding(AppScope::class, FlowTimeSession::class)
+class FlowTimeSessionLogic @Inject constructor(
+  private val timeProvider: TimeProvider,
 ) : FlowTimeSession {
 
   private val isRunning: AtomicBoolean = AtomicBoolean(true)
@@ -57,6 +63,10 @@ class FlowTimeSessionLogic(
 
   override fun stop() {
     isRunning.set(false)
+  }
+
+  override fun reset() {
+    isRunning.set(true)
   }
 
   private fun Duration.recommendedBreak(): Duration = when {
