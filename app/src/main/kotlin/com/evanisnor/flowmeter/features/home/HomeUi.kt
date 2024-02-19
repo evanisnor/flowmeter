@@ -1,8 +1,5 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.evanisnor.flowmeter.features.home
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,9 +30,8 @@ import com.evanisnor.flowmeter.features.home.HomeScreen.State
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 
-fun BoxWithConstraintsScope.isLandscape() = maxWidth > maxHeight
-
 @CircuitInject(HomeScreen::class, AppScope::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeUi(state: State, modifier: Modifier = Modifier) {
   FlowmeterTheme {

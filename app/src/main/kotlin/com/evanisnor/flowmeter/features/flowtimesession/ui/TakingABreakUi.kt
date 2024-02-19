@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.TakingABreak
-import com.evanisnor.flowmeter.features.home.isLandscape
+import com.evanisnor.flowmeter.ui.ext.isLandscape
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import kotlin.time.Duration.Companion.minutes
 
