@@ -3,6 +3,7 @@ plugins {
   alias(libs.plugins.jetbrains.kotlin.kapt)
   alias(libs.plugins.jetbrains.kotlin.android)
   alias(libs.plugins.anvil)
+  alias(libs.plugins.sqldelight)
 }
 
 android {
@@ -45,6 +46,15 @@ android {
       excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
   }
+
+
+  sqldelight {
+    databases {
+      create("Database") {
+        packageName.set("com.evanisnor.flowmeter")
+      }
+    }
+  }
 }
 
 dependencies {
@@ -57,6 +67,8 @@ dependencies {
   implementation(libs.androidx.ui.tooling.preview)
   implementation(libs.androidx.material3)
   implementation(libs.bundles.circuit)
+  implementation(libs.sqldelight.driver)
+  implementation(libs.sqldelight.adapters)
 
   implementation(libs.dagger)
   kapt(libs.dagger.compiler)

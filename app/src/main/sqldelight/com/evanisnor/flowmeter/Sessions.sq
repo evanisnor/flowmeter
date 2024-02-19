@@ -1,0 +1,15 @@
+CREATE TABLE session (
+    startedTimestampSec INTEGER NOT NULL,
+    completedTimestampSec INTEGER NOT NULL,
+    durationSec INTEGER NOT NULL,
+    PRIMARY KEY (startedTimestampSec, completedTimestampSec)
+);
+
+insert:
+INSERT INTO session(startedTimestampSec, completedTimestampSec, durationSec)
+VALUES(?, ?, ?);
+
+selectBetween:
+SELECT * FROM session
+WHERE startedTimestampSec >= :start AND completedTimestampSec <= :end
+ORDER BY startedTimestampSec;

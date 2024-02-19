@@ -12,6 +12,7 @@ anvil = "2.4.9"
 dagger = "2.50"
 turbine = "1.0.0"
 truth = "1.4.0"
+sqldelight = "2.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,6 +32,8 @@ circuit-retained = { group = "com.slack.circuit", name = "circuit-retained", ver
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger"}
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine"}
+sqldelight-driver = { group = "app.cash.sqldelight", name = "android-driver", version.ref = "sqldelight"}
+sqldelight-adapters = { group = "app.cash.sqldelight", name = "primitive-adapters", version.ref = "sqldelight"}
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth"}
 kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-test", version="kotlin" }
 
@@ -46,4 +49,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 anvil = { id = "com.squareup.anvil", version.ref="anvil" }
+sqldelight = { id = "app.cash.sqldelight", version.ref="sqldelight" }
 
