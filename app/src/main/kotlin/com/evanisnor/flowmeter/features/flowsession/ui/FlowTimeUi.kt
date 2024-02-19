@@ -36,12 +36,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.di.AppScope
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionEvent.EndSession
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionEvent.NewSession
+import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.EndSession
+import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionEvent.NewSession
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionComplete
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.SessionInProgress
-import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.Content.StartNew
+import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionComplete
+import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.SessionInProgress
+import com.evanisnor.flowmeter.features.flowsession.ui.SessionContent.StartNew
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 import kotlin.time.Duration.Companion.minutes
@@ -72,10 +72,10 @@ fun FlowTimeUi(state: State, modifier: Modifier = Modifier) {
       val screenModifier = modifier
         .padding(innerPadding)
         .fillMaxSize()
-      when (state.content) {
-        is StartNew -> StartNewUi(state = state.content, modifier = screenModifier)
-        is SessionComplete -> SessionCompleteUi(state = state.content, modifier = screenModifier)
-        is SessionInProgress -> SessionInProgressUi(state = state.content, modifier = screenModifier)
+      when (state.sessionContent) {
+        is StartNew -> StartNewUi(state = state.sessionContent, modifier = screenModifier)
+        is SessionComplete -> SessionCompleteUi(state = state.sessionContent, modifier = screenModifier)
+        is SessionInProgress -> SessionInProgressUi(state = state.sessionContent, modifier = screenModifier)
       }
     }
   }

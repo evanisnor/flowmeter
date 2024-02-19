@@ -32,6 +32,9 @@ interface FlowTimeSession : Flow<State> {
 
 }
 
+/**
+ * [FlowTimeSession] that does not do anything. Used as an initial state.
+ */
 object NoOpFlowTimeSession : FlowTimeSession {
   override suspend fun collect(collector: FlowCollector<State>) = Unit
   override fun stop() = Unit
