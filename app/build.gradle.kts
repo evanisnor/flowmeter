@@ -2,8 +2,10 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.jetbrains.kotlin.kapt)
   alias(libs.plugins.jetbrains.kotlin.android)
+  alias(libs.plugins.jetbrains.kotlin.parcelize)
   alias(libs.plugins.anvil)
   alias(libs.plugins.sqldelight)
+  alias(libs.plugins.ksp)
 }
 
 android {
@@ -72,6 +74,7 @@ dependencies {
 
   implementation(libs.dagger)
   kapt(libs.dagger.compiler)
+  ksp(libs.circuit.codegen)
 
   testImplementation(libs.junit)
   testImplementation(libs.turbine)

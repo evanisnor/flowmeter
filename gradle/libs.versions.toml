@@ -1,6 +1,7 @@
 [versions]
 agp = "8.4.0-alpha10"
 kotlin = "1.9.22"
+ksp = "1.9.22-1.0.17"
 
 coreKtx = "1.12.0"
 junit = "4.13.2"
@@ -29,6 +30,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 circuit-foundation = { group = "com.slack.circuit", name = "circuit-foundation", version.ref = "circuit" }
 circuit-overlay = { group = "com.slack.circuit", name = "circuit-overlay", version.ref = "circuit" }
 circuit-retained = { group = "com.slack.circuit", name = "circuit-retained", version.ref = "circuit" }
+circuit-codegen-annotations = { group = "com.slack.circuit", name = "circuit-codegen-annotations", version.ref = "circuit" }
+circuit-codegen = { group = "com.slack.circuit", name = "circuit-codegen", version.ref = "circuit" }
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger"}
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine"}
@@ -41,13 +44,16 @@ kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name="kotlinx-corout
 circuit = [
     "circuit-foundation",
     "circuit-overlay",
-    "circuit-retained"
+    "circuit-retained",
+    "circuit-codegen-annotations"
 ]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 anvil = { id = "com.squareup.anvil", version.ref="anvil" }
 sqldelight = { id = "app.cash.sqldelight", version.ref="sqldelight" }
+ksp = {id ="com.google.devtools.ksp", version.ref="ksp"}
 

@@ -1,10 +1,15 @@
 package com.evanisnor.flowmeter.features.flowsession.ui
 
+import com.slack.circuit.runtime.CircuitUiEvent
+import com.slack.circuit.runtime.CircuitUiState
+import com.slack.circuit.runtime.screen.Screen
+import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration
 
-object FlowTimeScreen {
+@Parcelize
+data object FlowTimeScreen : Screen {
 
-  sealed interface State {
+  sealed interface State : CircuitUiState {
     val eventSink: (Event) -> Unit
 
     data class StartNew(
@@ -23,7 +28,7 @@ object FlowTimeScreen {
     ) : State
   }
 
-  interface Event {
+  interface Event : CircuitUiEvent {
     data object NewSession : Event
     data object EndSession : Event
   }
