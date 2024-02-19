@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent
@@ -65,19 +68,25 @@ fun TakingABreakUi(state: TakingABreak, modifier: Modifier = Modifier) {
 }
 
 
+@PreviewScreenSizes
 @PreviewLightDark
 @Composable
 private fun TakingABreakPreview() {
   FlowmeterTheme {
     Surface {
-      TakingABreakUi(
-        state = TakingABreak(
-          duration = "1:10:13",
-          breakRecommendation = 10.minutes,
-          isBreakLongerThanRecommended = true,
-          eventSink = {},
+      Scaffold { padding ->
+        TakingABreakUi(
+          modifier = Modifier
+            .padding(padding)
+            .fillMaxSize(),
+          state = TakingABreak(
+            duration = "1:10:13",
+            breakRecommendation = 10.minutes,
+            isBreakLongerThanRecommended = true,
+            eventSink = {},
+          )
         )
-      )
+      }
     }
   }
 }
