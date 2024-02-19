@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.evanisnor.flowmeter.AppScope
+import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.Event.EndSession
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.Event.NewSession
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State

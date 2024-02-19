@@ -1,6 +1,6 @@
 package com.evanisnor.flowmeter.features.flowsession.data
 
-import com.evanisnor.flowmeter.AppScope
+import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.Database
 import com.evanisnor.flowmeter.features.flowsession.data.SessionRepository.Session
 import com.squareup.anvil.annotations.ContributesBinding

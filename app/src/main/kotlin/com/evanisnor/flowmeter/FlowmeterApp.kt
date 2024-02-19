@@ -2,12 +2,13 @@ package com.evanisnor.flowmeter
 
 import android.app.Application
 import android.content.Context
-import com.squareup.anvil.annotations.ContributesTo
+import androidx.activity.ComponentActivity
+import com.evanisnor.flowmeter.di.AnvilInjector
+import com.evanisnor.flowmeter.di.AppScope
+import com.evanisnor.flowmeter.di.SingleIn
 import com.squareup.anvil.annotations.MergeComponent
-import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
-import dagger.Module
 
 
 /**
@@ -16,6 +17,7 @@ import dagger.Module
 @SingleIn(AppScope::class)
 @MergeComponent(AppScope::class)
 interface FlowmeterAppComponent {
+  fun activityInjectors(): Map<Class<out ComponentActivity>, AnvilInjector<*>>
 
   @Component.Builder
   interface Builder {
@@ -29,8 +31,12 @@ interface FlowmeterAppComponent {
  */
 class FlowmeterApp : Application() {
 
-  override fun onCreate() {
-    super.onCreate()
-    DaggerFlowmeterAppComponent.builder().context(this).build()
+  private val appComponent: FlowmeterAppComponent = DaggerFlowmeterAppComponent.builder().context(this).build()
+
+  fun inject(activity: MainActivity) {
+    appComponent.activityInjectors()[activity::class.java]?.let {
+      it as MainActivityAnvilInjector
+      it.inject(activity)
+    }
   }
 }

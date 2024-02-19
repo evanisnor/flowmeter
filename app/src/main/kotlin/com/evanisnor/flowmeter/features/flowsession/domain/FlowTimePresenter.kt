@@ -2,7 +2,7 @@ package com.evanisnor.flowmeter.features.flowsession.domain
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import com.evanisnor.flowmeter.AppScope
+import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State
 import com.evanisnor.flowmeter.features.flowsession.ui.FlowTimeScreen.State.StartNew
@@ -27,7 +27,6 @@ class FlowTimePresenter @Inject constructor() : Presenter<State> {
     }
 
     val state by produceRetainedState(initialValue = StartNew(eventSink)) {
-      StartNew(eventSink)
     }
     return state
   }

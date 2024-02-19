@@ -1,4 +1,4 @@
-package com.evanisnor.flowmeter
+package com.evanisnor.flowmeter.di
 
 import javax.inject.Scope
 import kotlin.reflect.KClass
@@ -13,5 +13,5 @@ abstract class AppScope private constructor()
  */
 @Scope
 @Retention(AnnotationRetention.RUNTIME)
-annotation class SingleIn(val scope: KClass<*>)
+annotation class SingleIn(@Suppress("unused") val scope: KClass<*>)
 
