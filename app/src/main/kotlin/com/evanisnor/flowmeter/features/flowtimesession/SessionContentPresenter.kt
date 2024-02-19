@@ -12,6 +12,7 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEv
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionInProgress
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
+import com.evanisnor.flowmeter.features.flowtimesession.domain.TimeFormatter
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
@@ -21,6 +22,7 @@ import javax.inject.Provider
 
 class SessionContentPresenter @Inject constructor(
   private val flowTimeSessionProvider: Provider<FlowTimeSession>,
+  private val timeFormatter: TimeFormatter,
 ) : Presenter<SessionContent> {
 
   @Composable
@@ -36,7 +38,7 @@ class SessionContentPresenter @Inject constructor(
 
     val sessionContent by produceRetainedState<SessionContent>(initialValue = StartNew(eventSink)) {
       snapshotFlow { session.value }.collectLatest {
-        it.collectLatest { flowTimeState ->
+        it.collect { flowTimeState ->
           value = flowTimeState.toContent(eventSink)
         }
       }
@@ -49,12 +51,12 @@ class SessionContentPresenter @Inject constructor(
     when (this) {
       is FlowTimeSession.State.Tick ->
         SessionInProgress(
-          duration = duration.inWholeSeconds.toString(),
+          duration = timeFormatter.humanReadableClock(duration),
           eventSink = eventSink,
         )
       is FlowTimeSession.State.Complete ->
         SessionComplete(
-          duration = sessionDuration.inWholeSeconds.toString(),
+          duration = timeFormatter.humanReadableSentence(sessionDuration),
           breakRecommendation = recommendedBreak,
           eventSink = eventSink,
         )
