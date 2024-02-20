@@ -1,6 +1,7 @@
 package com.evanisnor.flowmeter.features.flowtimesession
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
@@ -12,9 +13,9 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEv
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.TakeABreak
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionInProgress
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
+import com.evanisnor.flowmeter.features.flowtimesession.domain.AttentionGrabber
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession
 import com.evanisnor.flowmeter.features.flowtimesession.domain.NoOpFlowTimeSession
-import com.evanisnor.flowmeter.features.flowtimesession.domain.AttentionGrabber
 import com.evanisnor.flowmeter.features.flowtimesession.domain.TimeFormatter
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
@@ -36,11 +37,21 @@ class SessionContentPresenter @Inject constructor(
     val session = rememberRetained { mutableStateOf<FlowTimeSession>(NoOpFlowTimeSession) }
     val takingABreak = rememberRetained { mutableStateOf(false) }
     val breakRecommendation = rememberRetained { mutableStateOf(0.minutes) }
+    val notifyBreakIsOver = rememberRetained { mutableStateOf(false) }
+
+    LaunchedEffect(session.value, notifyBreakIsOver.value) {
+      if (notifyBreakIsOver.value) {
+        attentionGrabber.notifyBreakIsOver()
+      } else {
+        attentionGrabber.clearBreakIsOverNotification()
+      }
+    }
 
     val eventSink: (SessionEvent) -> Unit = { event ->
       when (event) {
         is NewSession -> {
           takingABreak.value = false
+          notifyBreakIsOver.value = false
           session.value = flowTimeSessionProvider.get()
           attentionGrabber.notifySessionStarted()
         }
@@ -49,6 +60,7 @@ class SessionContentPresenter @Inject constructor(
         }
         is TakeABreak -> {
           takingABreak.value = true
+          notifyBreakIsOver.value = false
           breakRecommendation.value = event.duration
           session.value = flowTimeSessionProvider.get()
         }
@@ -60,13 +72,12 @@ class SessionContentPresenter @Inject constructor(
     }
 
     val sessionContent by produceRetainedState<SessionContent>(initialValue = StartNew(eventSink)) {
-      snapshotFlow { session.value }.collectLatest {session ->
+      snapshotFlow { session.value }.collectLatest { session ->
         session.collect { flowTimeState ->
           value = if (takingABreak.value) {
             flowTimeState.toBreakContent(breakRecommendation.value, eventSink).also {
-              if (it is SessionContent.TakingABreak && it.isBreakLongerThanRecommended) {
-                attentionGrabber.notifyRecommendedBreakIsOver()
-              }
+              notifyBreakIsOver.value =
+                (it is SessionContent.TakingABreak && it.isBreakLongerThanRecommended)
             }
           } else {
             flowTimeState.toSessionContent(eventSink)
@@ -102,7 +113,7 @@ class SessionContentPresenter @Inject constructor(
         SessionContent.TakingABreak(
           duration = timeFormatter.humanReadableClock(duration),
           breakRecommendation = breakRecommendation,
-          isBreakLongerThanRecommended = duration > breakRecommendation,
+          isBreakLongerThanRecommended = duration >= breakRecommendation,
           eventSink = eventSink,
         )
       is FlowTimeSession.State.Complete -> StartNew(eventSink = eventSink)

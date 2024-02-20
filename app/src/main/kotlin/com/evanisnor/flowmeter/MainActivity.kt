@@ -4,11 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import com.evanisnor.flowmeter.di.ActivityKey
 import com.evanisnor.flowmeter.di.AnvilInjector
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.InjectWith
 import com.evanisnor.flowmeter.features.home.HomeScreen
+import com.evanisnor.flowmeter.system.NotificationSystem
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitCompositionLocals
 import com.slack.circuit.foundation.CircuitContent
@@ -25,9 +27,18 @@ class MainActivity : ComponentActivity() {
   @Inject
   lateinit var circuit: Circuit
 
+  @Inject
+  lateinit var notificationSystem: NotificationSystem
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     (application as FlowmeterApp).inject(this)
+
+    // Notification Post Permission
+    if (!notificationSystem.isNotificationPermissionGranted()) {
+      notificationSystem.requestNotificationPermission(this)
+    }
+
     enableEdgeToEdge()
     setContent {
       CircuitCompositionLocals(circuit = circuit) {
@@ -35,7 +46,6 @@ class MainActivity : ComponentActivity() {
       }
     }
   }
-
 }
 
 class MainActivityAnvilInjector @Inject constructor(

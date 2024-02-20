@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">flowmeter</string>
+    <string name="notification_channel_session">Flow Session</string>
+    <string name="notification_channel_session_description">Get notified of Flow Session events, like when break time is over.</string>
 </resources>
