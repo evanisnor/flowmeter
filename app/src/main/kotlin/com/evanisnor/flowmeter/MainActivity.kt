@@ -11,9 +11,12 @@ import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.InjectWith
 import com.evanisnor.flowmeter.features.home.HomeScreen
 import com.evanisnor.flowmeter.system.NotificationSystem
+import com.slack.circuit.backstack.rememberSaveableBackStack
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitCompositionLocals
 import com.slack.circuit.foundation.CircuitContent
+import com.slack.circuit.foundation.NavigableCircuitContent
+import com.slack.circuit.foundation.rememberCircuitNavigator
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.MembersInjector
@@ -41,8 +44,10 @@ class MainActivity : ComponentActivity() {
 
     enableEdgeToEdge()
     setContent {
-      CircuitCompositionLocals(circuit = circuit) {
-        CircuitContent(HomeScreen)
+      CircuitCompositionLocals(circuit) {
+        val backStack = rememberSaveableBackStack(HomeScreen)
+        val navigator = rememberCircuitNavigator(backStack)
+        NavigableCircuitContent(navigator, backStack)
       }
     }
   }

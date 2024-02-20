@@ -16,5 +16,7 @@ data object HomeScreen : Screen {
 
   }
 
-  interface Event : CircuitUiEvent
+  interface Event : CircuitUiEvent {
+    data object OpenSettings : Event
+  }
 }
