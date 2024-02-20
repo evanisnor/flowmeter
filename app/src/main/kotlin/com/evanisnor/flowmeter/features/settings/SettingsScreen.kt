@@ -31,12 +31,12 @@ sealed interface SettingsListViewData {
 
   data class Setting(
     val label: String,
-    val description: String,
     val currentValue: String,
   ) : SettingsListViewData
 
   data class DisplayValue(val label: String, val value: String) : SettingsListViewData
   data class MoreInformation(val label: String) : SettingsListViewData
+  data object Divider : SettingsListViewData
 }
 
 sealed interface SettingsOverlay

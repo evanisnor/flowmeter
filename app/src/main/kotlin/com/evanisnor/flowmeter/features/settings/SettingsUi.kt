@@ -5,6 +5,7 @@ package com.evanisnor.flowmeter.features.settings
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsListViewData.DisplayVal
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.GroupHeading
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.MoreInformation
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Setting
+import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Divider
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBack
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
@@ -52,6 +55,7 @@ fun SettingsUi(state: State, modifier: Modifier = Modifier) {
       SettingsList(
         modifier = modifier
           .padding(padding)
+          .consumeWindowInsets(padding)
           .fillMaxWidth(),
         state = state,
       )
@@ -70,44 +74,59 @@ private fun TopBar(onNavigateBack: () -> Unit) {
         )
       }
     },
-    title = { Text(stringResource(R.string.screen_settings).lowercase()) },
+    title = {  },
   )
 }
 
 @Composable
 private fun SettingsList(state: State, modifier: Modifier = Modifier) {
   LazyColumn(modifier = modifier) {
-    items(items = state.settingsItems) {
-      Box(
-        modifier = Modifier.defaultMinSize(minHeight = 48.dp),
-        contentAlignment = Alignment.CenterStart
-      ) {
-        val itemModifier = Modifier.fillMaxWidth()
-        when (it) {
-          is GroupHeading -> GroupHeadingItem(it, modifier = itemModifier)
-          is Setting -> SettingItem(it, modifier = itemModifier)
-          is DisplayValue -> DisplayValueItem(it, modifier = itemModifier)
-          is MoreInformation -> MoreInformationItem(it, modifier = itemModifier)
-        }
+    item {
+      ColumnItem {
+        Text(
+          modifier = Modifier.padding(vertical = 16.dp),
+          text = stringResource(R.string.screen_settings),
+          style = MaterialTheme.typography.headlineLarge,
+        )
       }
     }
+    items(items = state.settingsItems) {
+      when (it) {
+        is GroupHeading -> ColumnItem { GroupHeadingItem(it) }
+        is Setting -> ColumnItem { SettingItem(it) }
+        is DisplayValue -> ColumnItem {  DisplayValueItem(it)}
+        is MoreInformation -> ColumnItem {  MoreInformationItem(it) }
+        is Divider -> HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+      }
+    }
+  }
+}
+
+/**
+ * For consistent styling of items in the LazyColumn
+ */
+@Composable
+private fun ColumnItem(content : @Composable () -> Unit) {
+  Box(modifier = Modifier
+    .defaultMinSize(minHeight = 52.dp)
+    .padding(horizontal = 16.dp)
+    .fillMaxWidth(),
+    contentAlignment = Alignment.CenterStart,
+    ) {
+    content()
   }
 }
 
 @Composable
 private fun GroupHeadingItem(groupHeading: GroupHeading, modifier: Modifier = Modifier) {
   Row(
-    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    modifier = modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Icon(
-      imageVector = groupHeading.icon,
-      contentDescription = null,
-    )
     Text(
-      modifier = modifier.padding(horizontal = 16.dp),
       text = groupHeading.label,
-      style = MaterialTheme.typography.titleMedium,
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.primary,
     )
   }
 }
@@ -115,14 +134,14 @@ private fun GroupHeadingItem(groupHeading: GroupHeading, modifier: Modifier = Mo
 @Composable
 private fun SettingItem(setting: Setting, modifier: Modifier = Modifier) {
   Column(
-    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    modifier = modifier.fillMaxWidth(),
   ) {
     Text(
       text = setting.label,
       style = MaterialTheme.typography.labelLarge,
     )
     Text(
-      text = setting.description,
+      text = setting.currentValue,
       style = MaterialTheme.typography.bodySmall,
     )
   }
@@ -131,7 +150,7 @@ private fun SettingItem(setting: Setting, modifier: Modifier = Modifier) {
 @Composable
 private fun DisplayValueItem(displayValue: DisplayValue, modifier: Modifier = Modifier) {
   Column(
-    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    modifier = modifier.fillMaxWidth(),
   ) {
     Text(
       text = displayValue.label,
@@ -147,7 +166,7 @@ private fun DisplayValueItem(displayValue: DisplayValue, modifier: Modifier = Mo
 @Composable
 private fun MoreInformationItem(moreInformation: MoreInformation, modifier: Modifier = Modifier) {
   Text(
-    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    modifier = modifier.fillMaxWidth(),
     text = moreInformation.label,
     style = MaterialTheme.typography.labelLarge,
   )
@@ -161,20 +180,20 @@ private fun SettingsUiPreview() {
       GroupHeading(icon = Icons.Filled.Notifications, label = "Notifications"),
       Setting(
         label = "Sound One",
-        description = "Change a sound made by the app",
         currentValue = "Ringtone 1"
       ),
       Setting(
         label = "Sound Two",
-        description = "Change a sound made by the app",
         currentValue = "Ringtone 2"
       ),
+      Divider,
       GroupHeading(icon = Icons.Filled.Info, label = "Information"),
       DisplayValue(
         label = "App version",
         value = "0.1.0",
       ),
-      MoreInformation("Open Source Attribution")
+      MoreInformation("Privacy Policy"),
+      MoreInformation("Open Source Attribution"),
     ),
     eventSink = {}
   ))
