@@ -26,7 +26,6 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 class SessionContentPresenter @Inject constructor(
   private val flowTimeSessionProvider: Provider<FlowTimeSession>,
@@ -109,7 +108,7 @@ class SessionContentPresenter @Inject constructor(
       is FlowTimeSession.State.Complete ->
         SessionComplete(
           duration = timeFormatter.humanReadableSentence(sessionDuration),
-          breakRecommendation = 5.seconds,//recommendedBreak,
+          breakRecommendation = recommendedBreak,
           eventSink = eventSink,
         )
     }
