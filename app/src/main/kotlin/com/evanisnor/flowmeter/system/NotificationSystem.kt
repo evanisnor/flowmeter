@@ -20,11 +20,11 @@ private const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
 private val VIBRATION_PATTERN = arrayOf(
   0L,
   1000L,
-  100L,
+  200L,
   1000L,
-  100L,
+  200L,
   1000L,
-  100L,
+  200L,
   1000L,
 ).toLongArray()
 
