@@ -17,6 +17,7 @@ import com.evanisnor.flowmeter.features.flowtimesession.domain.AttentionGrabber
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession
 import com.evanisnor.flowmeter.features.flowtimesession.domain.NoOpFlowTimeSession
 import com.evanisnor.flowmeter.features.flowtimesession.domain.TimeFormatter
+import com.evanisnor.flowmeter.system.NotificationSystem
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
@@ -31,6 +32,7 @@ class SessionContentPresenter @Inject constructor(
   private val flowTimeSessionProvider: Provider<FlowTimeSession>,
   private val timeFormatter: TimeFormatter,
   private val attentionGrabber: AttentionGrabber,
+  private val notificationSystem: NotificationSystem,
 ) : Presenter<SessionContent> {
 
   @Composable
@@ -51,6 +53,7 @@ class SessionContentPresenter @Inject constructor(
     val eventSink: (SessionEvent) -> Unit = { event ->
       when (event) {
         is NewSession -> {
+          checkForNotificationPermission()
           takingABreak.value = false
           notifyBreakIsOver.value = false
           session.value = flowTimeSessionProvider.get()
@@ -88,6 +91,12 @@ class SessionContentPresenter @Inject constructor(
     }
 
     return sessionContent
+  }
+
+  private fun checkForNotificationPermission() {
+    if (!notificationSystem.isNotificationPermissionGranted()) {
+      notificationSystem.requestPermission()
+    }
   }
 
   private fun FlowTimeSession.State.toSessionContent(eventSink: (SessionEvent) -> Unit) =

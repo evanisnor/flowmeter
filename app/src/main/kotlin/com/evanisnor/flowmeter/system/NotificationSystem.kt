@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -12,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
+import com.evanisnor.flowmeter.di.SingleIn
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -34,7 +36,8 @@ private val VIBRATION_PATTERN = arrayOf(
 interface NotificationSystem {
   fun createNotificationChannel()
   fun isNotificationPermissionGranted(): Boolean
-  fun requestNotificationPermission(activity: ComponentActivity)
+  fun registerForPermissionResult(activity: ComponentActivity)
+  fun requestPermission()
 }
 
 /**
@@ -50,7 +53,7 @@ interface NotificationPublisher {
   fun cancel(notificationId: Int)
 }
 
-
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, NotificationSystem::class)
 @ContributesBinding(AppScope::class, NotificationPublisher::class)
 class NotificationSystemInterface @Inject constructor(
@@ -60,14 +63,20 @@ class NotificationSystemInterface @Inject constructor(
   private val intentProvider: IntentProvider,
 ) : NotificationSystem, NotificationPublisher {
 
+  private var permissionRequestLauncher: ActivityResultLauncher<String>? = null
+
   override fun isNotificationPermissionGranted(): Boolean {
     val result = PermissionChecker.checkSelfPermission(context, POST_NOTIFICATIONS)
     return result == PackageManager.PERMISSION_GRANTED
   }
 
-  override fun requestNotificationPermission(activity: ComponentActivity) {
-    activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
-    }.launch(POST_NOTIFICATIONS)
+  override fun registerForPermissionResult(activity: ComponentActivity) {
+    permissionRequestLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
+    }
+  }
+
+  override fun requestPermission() {
+    permissionRequestLauncher?.launch(POST_NOTIFICATIONS)
   }
 
   override fun createNotificationChannel() {

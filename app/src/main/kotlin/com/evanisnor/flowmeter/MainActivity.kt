@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
     // Notification Post Permission
     if (!notificationSystem.isNotificationPermissionGranted()) {
-      notificationSystem.requestNotificationPermission(this)
+      notificationSystem.registerForPermissionResult(this)
     }
 
     enableEdgeToEdge()
