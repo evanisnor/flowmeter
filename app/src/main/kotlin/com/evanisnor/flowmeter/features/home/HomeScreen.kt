@@ -12,9 +12,7 @@ data object HomeScreen : Screen {
   data class State(
     val sessionContent: SessionContent,
     val eventSink: (Event) -> Unit
-  ) : CircuitUiState {
-
-  }
+  ) : CircuitUiState
 
   interface Event : CircuitUiEvent {
     data object OpenSettings : Event
