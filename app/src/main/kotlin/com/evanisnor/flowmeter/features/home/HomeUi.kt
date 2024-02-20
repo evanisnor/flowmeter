@@ -1,5 +1,10 @@
 package com.evanisnor.flowmeter.features.home
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -47,17 +52,41 @@ fun HomeUi(state: State, modifier: Modifier = Modifier) {
       val screenModifier = modifier
         .padding(innerPadding)
         .fillMaxSize()
-      when (state.sessionContent) {
-        is StartNew -> StartNewUi(state = state.sessionContent, modifier = screenModifier)
-        is SessionComplete -> SessionCompleteUi(
-          state = state.sessionContent,
-          modifier = screenModifier
-        )
-        is SessionInProgress -> SessionInProgressUi(
-          state = state.sessionContent,
-          modifier = screenModifier
-        )
-        is TakingABreak -> TakingABreakUi(state = state.sessionContent, modifier = screenModifier)
+
+      AnimatedContent(
+        targetState = state,
+        transitionSpec = {
+          val duration =
+            if (initialState.sessionContent::class == targetState.sessionContent::class) {
+              // Do not animate if the screen is recomposing session content
+              // It will appear to flash with every clock tick
+              0
+            } else {
+              1000
+            }
+          fadeIn(
+            animationSpec = tween(duration)
+          ) togetherWith fadeOut(
+            animationSpec = tween(duration)
+          )
+        },
+        label = "Home UI"
+      ) { targetState ->
+        when (targetState.sessionContent) {
+          is StartNew -> StartNewUi(state = targetState.sessionContent, modifier = screenModifier)
+          is SessionComplete -> SessionCompleteUi(
+            state = targetState.sessionContent,
+            modifier = screenModifier
+          )
+          is SessionInProgress -> SessionInProgressUi(
+            state = targetState.sessionContent,
+            modifier = screenModifier
+          )
+          is TakingABreak -> TakingABreakUi(
+            state = targetState.sessionContent,
+            modifier = screenModifier
+          )
+        }
       }
     }
   }
