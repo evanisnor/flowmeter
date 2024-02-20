@@ -1,4 +1,4 @@
-package com.evanisnor.flowmeter.circuit
+package com.evanisnor.flowmeter.ui.circuit
 
 import com.evanisnor.flowmeter.di.AppScope
 import com.slack.circuit.foundation.Circuit
