@@ -2,6 +2,6 @@ package com.evanisnor.flowmeter
 
 object FeatureFlags {
 
-  const val SETTINGS = false
+  const val SETTINGS = true
 
 }
