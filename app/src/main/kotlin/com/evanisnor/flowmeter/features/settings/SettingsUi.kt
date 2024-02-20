@@ -2,6 +2,7 @@
 
 package com.evanisnor.flowmeter.features.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,10 +33,10 @@ import androidx.compose.ui.unit.dp
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.DisplayValue
+import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Divider
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.GroupHeading
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.MoreInformation
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Setting
-import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Divider
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBack
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
@@ -58,6 +59,9 @@ fun SettingsUi(state: State, modifier: Modifier = Modifier) {
           .consumeWindowInsets(padding)
           .fillMaxWidth(),
         state = state,
+        onFieldSelected = { field ->
+          state.eventSink(SettingsScreen.Event.FieldSelected(field))
+        }
       )
     }
   }
@@ -74,17 +78,21 @@ private fun TopBar(onNavigateBack: () -> Unit) {
         )
       }
     },
-    title = {  },
+    title = { },
   )
 }
 
 @Composable
-private fun SettingsList(state: State, modifier: Modifier = Modifier) {
+private fun SettingsList(
+  state: State,
+  onFieldSelected: (SettingsScreen.Field) -> Unit,
+  modifier: Modifier = Modifier,
+) {
   LazyColumn(modifier = modifier) {
     item {
       ColumnItem {
         Text(
-          modifier = Modifier.padding(vertical = 16.dp),
+          modifier = Modifier.padding(top = 32.dp, bottom = 16.dp),
           text = stringResource(R.string.screen_settings),
           style = MaterialTheme.typography.headlineLarge,
         )
@@ -92,11 +100,19 @@ private fun SettingsList(state: State, modifier: Modifier = Modifier) {
     }
     items(items = state.settingsItems) {
       when (it) {
-        is GroupHeading -> ColumnItem { GroupHeadingItem(it) }
-        is Setting -> ColumnItem { SettingItem(it) }
-        is DisplayValue -> ColumnItem {  DisplayValueItem(it)}
-        is MoreInformation -> ColumnItem {  MoreInformationItem(it) }
         is Divider -> HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        is GroupHeading -> ColumnItem { GroupHeadingItem(it) }
+        is DisplayValue -> ColumnItem { DisplayValueItem(it) }
+        is Setting -> ColumnItem(
+          modifier = Modifier.clickable { onFieldSelected(it.field) }
+        ) {
+          SettingItem(it)
+        }
+        is MoreInformation -> ColumnItem(
+          modifier = Modifier.clickable { onFieldSelected(it.field) }
+        ) {
+          MoreInformationItem(it)
+        }
       }
     }
   }
@@ -106,13 +122,14 @@ private fun SettingsList(state: State, modifier: Modifier = Modifier) {
  * For consistent styling of items in the LazyColumn
  */
 @Composable
-private fun ColumnItem(content : @Composable () -> Unit) {
-  Box(modifier = Modifier
-    .defaultMinSize(minHeight = 52.dp)
-    .padding(horizontal = 16.dp)
-    .fillMaxWidth(),
+private fun ColumnItem(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+  Box(
+    modifier = modifier
+      .defaultMinSize(minHeight = 52.dp)
+      .padding(horizontal = 16.dp)
+      .fillMaxWidth(),
     contentAlignment = Alignment.CenterStart,
-    ) {
+  ) {
     content()
   }
 }
@@ -138,11 +155,12 @@ private fun SettingItem(setting: Setting, modifier: Modifier = Modifier) {
   ) {
     Text(
       text = setting.label,
-      style = MaterialTheme.typography.labelLarge,
+      style = MaterialTheme.typography.bodyMedium,
     )
     Text(
       text = setting.currentValue,
       style = MaterialTheme.typography.bodySmall,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
   }
 }
@@ -154,11 +172,12 @@ private fun DisplayValueItem(displayValue: DisplayValue, modifier: Modifier = Mo
   ) {
     Text(
       text = displayValue.label,
-      style = MaterialTheme.typography.labelLarge,
+      style = MaterialTheme.typography.bodyMedium,
     )
     Text(
       text = displayValue.value,
       style = MaterialTheme.typography.bodySmall,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
   }
 }
@@ -168,7 +187,7 @@ private fun MoreInformationItem(moreInformation: MoreInformation, modifier: Modi
   Text(
     modifier = modifier.fillMaxWidth(),
     text = moreInformation.label,
-    style = MaterialTheme.typography.labelLarge,
+    style = MaterialTheme.typography.bodyMedium,
   )
 }
 
@@ -179,11 +198,13 @@ private fun SettingsUiPreview() {
     settingsItems = persistentListOf(
       GroupHeading(icon = Icons.Filled.Notifications, label = "Notifications"),
       Setting(
-        label = "Sound One",
+        field = SettingsScreen.Field.SessionStartSound,
+        label = "Sound one",
         currentValue = "Ringtone 1"
       ),
       Setting(
-        label = "Sound Two",
+        field = SettingsScreen.Field.BreakIsOverSound,
+        label = "Sound two",
         currentValue = "Ringtone 2"
       ),
       Divider,
@@ -192,8 +213,14 @@ private fun SettingsUiPreview() {
         label = "App version",
         value = "0.1.0",
       ),
-      MoreInformation("Privacy Policy"),
-      MoreInformation("Open Source Attribution"),
+      MoreInformation(
+        field = SettingsScreen.Field.PrivacyPolicy,
+        label = "Privacy policy"
+      ),
+      MoreInformation(
+        field = SettingsScreen.Field.OpenSourceAttribution,
+        label = "Open source attribution"
+      ),
     ),
     eventSink = {}
   ))
