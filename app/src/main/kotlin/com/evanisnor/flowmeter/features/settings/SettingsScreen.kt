@@ -1,35 +1,47 @@
 package com.evanisnor.flowmeter.features.settings
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.evanisnor.flowmeter.features.settings.SettingsScreen.Field
 import com.slack.circuit.runtime.CircuitUiEvent
 import com.slack.circuit.runtime.CircuitUiState
 import com.slack.circuit.runtime.screen.Screen
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.parcelize.Parcelize
 
+typealias FieldId = String
 
 @Parcelize
 data object SettingsScreen : Screen {
 
   data class State(
     val settingsItems: ImmutableList<SettingsListViewData>,
-    val overlay: SettingsOverlay? = null,
+    val overlayState: SettingsOverlay.State? = null,
     val eventSink: (Event) -> Unit,
   ) : CircuitUiState
 
-  enum class Field {
-    SessionStartSound,
-    BreakIsOverSound,
-    PrivacyPolicy,
-    OpenSourceAttribution,
-  }
-
   sealed interface Event : CircuitUiEvent {
     data object NavigateBack : Event
-    data class FieldSelected(val field: Field) : Event
+    data class FieldSelected(val field: FieldId) : Event
+    data class OverlayResult(val result: SettingsOverlay.OverlayResult) : Event
+  }
+}
+
+data class Sound(
+  val id : Int,
+  val label: String,
+)
+
+object SettingsOverlay {
+  sealed interface State {
+    val field: FieldId
+
+    data class SoundPickerState(override val field: FieldId, val currentSound: Sound) : State
+    data class InformationState(override val field: FieldId) : State
   }
 
+  sealed interface OverlayResult {
+    data class SelectSound(val field: FieldId, val soundId: Int) : OverlayResult
+    data object Dismiss : OverlayResult
+  }
 }
 
 sealed interface SettingsListViewData {
@@ -40,18 +52,16 @@ sealed interface SettingsListViewData {
   ) : SettingsListViewData
 
   data class Setting(
-    val field: Field,
+    val field: FieldId,
     val label: String,
     val currentValue: String,
   ) : SettingsListViewData
 
   data class DisplayValue(val label: String, val value: String) : SettingsListViewData
   data class MoreInformation(
-    val field: Field,
+    val field: FieldId,
     val label: String,
   ) : SettingsListViewData
 
   data object Divider : SettingsListViewData
 }
-
-sealed interface SettingsOverlay

@@ -39,6 +39,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsListViewData.MoreInform
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Setting
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBack
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
+import com.evanisnor.flowmeter.features.settings.ui.SettingsOverlayUi
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 import kotlinx.collections.immutable.persistentListOf
@@ -63,6 +64,10 @@ fun SettingsUi(state: State, modifier: Modifier = Modifier) {
           state.eventSink(SettingsScreen.Event.FieldSelected(field))
         }
       )
+
+      SettingsOverlayUi(
+        state = state.overlayState,
+        onResult = { state.eventSink(SettingsScreen.Event.OverlayResult(it)) })
     }
   }
 }
@@ -85,7 +90,7 @@ private fun TopBar(onNavigateBack: () -> Unit) {
 @Composable
 private fun SettingsList(
   state: State,
-  onFieldSelected: (SettingsScreen.Field) -> Unit,
+  onFieldSelected: (FieldId) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   LazyColumn(modifier = modifier) {
@@ -198,12 +203,12 @@ private fun SettingsUiPreview() {
     settingsItems = persistentListOf(
       GroupHeading(icon = Icons.Filled.Notifications, label = "Notifications"),
       Setting(
-        field = SettingsScreen.Field.SessionStartSound,
+        field = "",
         label = "Sound one",
         currentValue = "Ringtone 1"
       ),
       Setting(
-        field = SettingsScreen.Field.BreakIsOverSound,
+        field = "",
         label = "Sound two",
         currentValue = "Ringtone 2"
       ),
@@ -214,11 +219,11 @@ private fun SettingsUiPreview() {
         value = "0.1.0",
       ),
       MoreInformation(
-        field = SettingsScreen.Field.PrivacyPolicy,
+        field = "",
         label = "Privacy policy"
       ),
       MoreInformation(
-        field = SettingsScreen.Field.OpenSourceAttribution,
+        field = "",
         label = "Open source attribution"
       ),
     ),
