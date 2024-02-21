@@ -11,6 +11,8 @@ import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.InjectWith
 import com.evanisnor.flowmeter.features.home.HomeScreen
 import com.evanisnor.flowmeter.system.NotificationSystem
+import com.evanisnor.flowmeter.system.RingtoneInitializer
+import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.backstack.rememberSaveableBackStack
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitCompositionLocals
@@ -33,6 +35,9 @@ class MainActivity : ComponentActivity() {
   @Inject
   lateinit var notificationSystem: NotificationSystem
 
+  @Inject
+  lateinit var ringtoneInitializer: RingtoneInitializer
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     (application as FlowmeterApp).inject(this)
@@ -41,6 +46,7 @@ class MainActivity : ComponentActivity() {
     if (!notificationSystem.isNotificationPermissionGranted()) {
       notificationSystem.registerForPermissionResult(this)
     }
+    ringtoneInitializer.initialize(this)
 
     enableEdgeToEdge()
     setContent {

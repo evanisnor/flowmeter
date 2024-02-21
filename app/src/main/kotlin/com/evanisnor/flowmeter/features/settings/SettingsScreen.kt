@@ -1,6 +1,7 @@
 package com.evanisnor.flowmeter.features.settings
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.runtime.CircuitUiEvent
 import com.slack.circuit.runtime.CircuitUiState
 import com.slack.circuit.runtime.screen.Screen
@@ -25,21 +26,20 @@ data object SettingsScreen : Screen {
   }
 }
 
-data class Sound(
-  val id : Int,
-  val label: String,
-)
-
 object SettingsOverlay {
   sealed interface State {
     val field: FieldId
 
-    data class SoundPickerState(override val field: FieldId, val currentSound: Sound) : State
+    data class SoundPickerState(
+      override val field: FieldId,
+      val availableSounds: List<RingtoneSystem.RingtoneSound>,
+      val currentSound: RingtoneSystem.RingtoneSound
+    ) : State
     data class InformationState(override val field: FieldId) : State
   }
 
   sealed interface OverlayResult {
-    data class SelectSound(val field: FieldId, val soundId: Int) : OverlayResult
+    data class SelectSound(val field: FieldId, val sound: RingtoneSystem.RingtoneSound) : OverlayResult
     data object Dismiss : OverlayResult
   }
 }
