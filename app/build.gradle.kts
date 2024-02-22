@@ -71,6 +71,7 @@ dependencies {
   implementation(libs.bundles.circuit)
   implementation(libs.sqldelight.driver)
   implementation(libs.sqldelight.adapters)
+  implementation(libs.datastore)
 
   implementation(libs.dagger)
   kapt(libs.dagger.compiler)

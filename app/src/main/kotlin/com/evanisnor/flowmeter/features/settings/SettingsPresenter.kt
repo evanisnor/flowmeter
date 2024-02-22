@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
@@ -22,6 +23,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.FieldSelected
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBack
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
+import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.retained.rememberRetained
@@ -31,6 +33,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 
 private const val SETTING_SESSION_START_SOUND = "session_start_sound"
 private const val SETTING_BREAK_IS_OVER_SOUND = "break_is_over_sound"
@@ -40,9 +43,11 @@ private const val INFO_OPEN_SOURCE_ATTRIBUTION = "open_source_attribution"
 class SettingsPresenter @AssistedInject constructor(
   @Assisted private val navigator: Navigator,
   private val ringtoneSystem: RingtoneSystem,
+  private val settingsRepository: SettingsRepository,
 ) : Presenter<State> {
   @Composable
   override fun present(): State {
+    val scope = rememberCoroutineScope()
     val overlay = rememberRetained { mutableStateOf<SettingsOverlay.State?>(null) }
     val availableSounds =
       rememberRetained { mutableStateOf(emptyList<RingtoneSystem.RingtoneSound>()) }
@@ -53,6 +58,28 @@ class SettingsPresenter @AssistedInject constructor(
 
     LaunchedEffect(Unit) {
       availableSounds.value = ringtoneSystem.getSounds()
+      sessionStartSound.value = settingsRepository.getSessionStartSound()
+      breakIsOverSound.value = settingsRepository.getBreakIsOverSound()
+    }
+
+
+    val overlayResultSink: (SettingsOverlay.OverlayResult) -> Unit = { result ->
+      when (result) {
+        is Dismiss -> overlay.value = null
+        is SelectSound -> {
+          when(result.field) {
+            SETTING_SESSION_START_SOUND -> {
+              sessionStartSound.value = result.sound
+              scope.launch { settingsRepository.saveSessionStartSound(result.sound) }
+            }
+            SETTING_BREAK_IS_OVER_SOUND -> {
+              breakIsOverSound.value = result.sound
+              scope.launch { settingsRepository.saveBreakIsOverSound(result.sound) }
+            }
+          }
+          overlay.value = null
+        }
+      }
     }
 
     val eventSink: (Event) -> Unit = { event ->
@@ -79,19 +106,11 @@ class SettingsPresenter @AssistedInject constructor(
           }
         }
         is Event.OverlayResult -> {
-          when (event.result) {
-            is Dismiss -> overlay.value = null
-            is SelectSound -> {
-              when(event.result.field) {
-                SETTING_SESSION_START_SOUND -> sessionStartSound.value = event.result.sound
-                SETTING_BREAK_IS_OVER_SOUND -> breakIsOverSound.value = event.result.sound
-              }
-              overlay.value = null
-            }
-          }
+          overlayResultSink(event.result)
         }
       }
     }
+
 
     return buildState(
       overlay = overlay.value,
