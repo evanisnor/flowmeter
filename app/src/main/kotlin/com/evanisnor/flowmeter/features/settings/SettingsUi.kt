@@ -16,12 +16,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -37,6 +39,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Divider
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.GroupHeading
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.MoreInformation
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Setting
+import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Toggle
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBack
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
 import com.evanisnor.flowmeter.features.settings.ui.SettingsOverlayUi
@@ -113,6 +116,11 @@ private fun SettingsList(
         ) {
           SettingItem(it)
         }
+        is Toggle -> ColumnItem(
+          modifier = Modifier.clickable { onFieldSelected(it.field) }
+        ) {
+          ToggleItem(it, onCheckedChange = {_ ->onFieldSelected(it.field)})
+        }
         is MoreInformation -> ColumnItem(
           modifier = Modifier.clickable { onFieldSelected(it.field) }
         ) {
@@ -171,6 +179,24 @@ private fun SettingItem(setting: Setting, modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun ToggleItem(toggle: Toggle, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+  Row(
+    modifier = modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      modifier = Modifier.weight(1f),
+      text = toggle.label,
+      style = MaterialTheme.typography.bodyMedium,
+    )
+    Switch(
+      checked = toggle.currentValue,
+      onCheckedChange = onCheckedChange,
+    )
+  }
+}
+
+@Composable
 private fun DisplayValueItem(displayValue: DisplayValue, modifier: Modifier = Modifier) {
   Column(
     modifier = modifier.fillMaxWidth(),
@@ -211,6 +237,11 @@ private fun SettingsUiPreview() {
         field = "",
         label = "Sound two",
         currentValue = "Ringtone 2"
+      ),
+      Toggle(
+        field = "",
+        label = "Vibrate?",
+        currentValue = true
       ),
       Divider,
       GroupHeading(icon = Icons.Filled.Info, label = "Information"),

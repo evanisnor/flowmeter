@@ -15,6 +15,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Divider
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.GroupHeading
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.MoreInformation
 import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Setting
+import com.evanisnor.flowmeter.features.settings.SettingsListViewData.Toggle
 import com.evanisnor.flowmeter.features.settings.SettingsOverlay.OverlayResult.Dismiss
 import com.evanisnor.flowmeter.features.settings.SettingsOverlay.OverlayResult.SelectSound
 import com.evanisnor.flowmeter.features.settings.SettingsOverlay.State.InformationState
@@ -39,6 +40,7 @@ import kotlinx.coroutines.launch
 
 private const val SETTING_SESSION_START_SOUND = "session_start_sound"
 private const val SETTING_BREAK_IS_OVER_SOUND = "break_is_over_sound"
+private const val SETTING_BREAK_IS_OVER_VIBRATE = "break_is_over_vibrate"
 private const val INFO_PRIVACY_POLICY = "privacy_policy"
 private const val INFO_OPEN_SOURCE_ATTRIBUTION = "open_source_attribution"
 
@@ -57,13 +59,21 @@ class SettingsPresenter @AssistedInject constructor(
       rememberRetained { mutableStateOf(emptyList<RingtoneSystem.RingtoneSound>()) }
 
     val sessionStartSound = rememberRetained { mutableStateOf(ringtoneSystem.getDefaultSound()) }
-    val breakIsOverSound = rememberRetained { mutableStateOf(ringtoneSystem.getDefaultSound()) }
+    val breakIsOver = rememberRetained { mutableStateOf(
+      NotificationSystem.NotificationChannelSettings(
+        sound = ringtoneSystem.getDefaultSound(),
+        vibrate = true,
+      ))
+    }
     val appVersion = "0.1.0"
 
     LaunchedEffect(Unit) {
       availableSounds.value = ringtoneSystem.getSounds()
       sessionStartSound.value = settingsRepository.getSessionStartSound()
-      breakIsOverSound.value = settingsRepository.getBreakIsOverSound()
+      breakIsOver.value = NotificationSystem.NotificationChannelSettings(
+        sound = settingsRepository.getBreakIsOverSound(),
+        vibrate = settingsRepository.getBreakIsOverVibrate()
+      )
     }
 
 
@@ -78,13 +88,10 @@ class SettingsPresenter @AssistedInject constructor(
               scope.launch { settingsRepository.saveSessionStartSound(result.sound) }
             }
             SETTING_BREAK_IS_OVER_SOUND -> {
-              breakIsOverSound.value = result.sound
+              breakIsOver.value = breakIsOver.value.copy(sound = result.sound)
               scope.launch {
                 settingsRepository.saveBreakIsOverSound(result.sound)
-                notificationSystem.createNotificationChannel(settings = NotificationSystem.NotificationChannelSettings(
-                  sound = result.sound,
-                  vibrate = true,
-                ))
+                notificationSystem.createNotificationChannel(settings = breakIsOver.value)
               }
             }
           }
@@ -108,8 +115,16 @@ class SettingsPresenter @AssistedInject constructor(
               overlay.value = SoundPickerState(
                 field = event.field,
                 availableSounds = availableSounds.value,
-                currentSound = breakIsOverSound.value,
+                currentSound = breakIsOver.value.sound,
               )
+            SETTING_BREAK_IS_OVER_VIBRATE -> {
+              val vibrate = !breakIsOver.value.vibrate
+              breakIsOver.value = breakIsOver.value.copy(vibrate = vibrate)
+              scope.launch {
+                settingsRepository.saveBreakIsOverVibrate(vibrate)
+                notificationSystem.createNotificationChannel(settings = breakIsOver.value)
+              }
+            }
             INFO_PRIVACY_POLICY -> overlay.value =
               InformationState(event.field)
             INFO_OPEN_SOURCE_ATTRIBUTION -> overlay.value =
@@ -126,7 +141,8 @@ class SettingsPresenter @AssistedInject constructor(
     return buildState(
       overlay = overlay.value,
       sessionStartSound = sessionStartSound.value,
-      breakIsOverSound = breakIsOverSound.value,
+      breakIsOverSound = breakIsOver.value.sound,
+      breakIsOverVibrate = breakIsOver.value.vibrate,
       appVersion = appVersion,
       eventSink = eventSink,
     )
@@ -137,6 +153,7 @@ class SettingsPresenter @AssistedInject constructor(
     overlay: SettingsOverlay.State?,
     sessionStartSound: RingtoneSystem.RingtoneSound,
     breakIsOverSound: RingtoneSystem.RingtoneSound,
+    breakIsOverVibrate: Boolean,
     appVersion: String,
     eventSink: (Event) -> Unit,
   ): State = State(
@@ -154,6 +171,11 @@ class SettingsPresenter @AssistedInject constructor(
         field = SETTING_BREAK_IS_OVER_SOUND,
         label = stringResource(R.string.settings_notification_break_is_over),
         currentValue = breakIsOverSound.name
+      ),
+      Toggle(
+        field = SETTING_BREAK_IS_OVER_VIBRATE,
+        label = stringResource(R.string.settings_notification_break_is_over_vibrate),
+        currentValue = breakIsOverVibrate,
       ),
       Divider,
       GroupHeading(

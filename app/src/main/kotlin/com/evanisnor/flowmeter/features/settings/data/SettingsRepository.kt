@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -25,10 +26,14 @@ interface SettingsRepository {
   suspend fun saveBreakIsOverSound(sound: RingtoneSound)
   suspend fun getBreakIsOverSound(): RingtoneSound
 
+  suspend fun saveBreakIsOverVibrate(vibrate: Boolean)
+  suspend fun getBreakIsOverVibrate(): Boolean
+
 }
 
 private const val KEY_SESSION_START_SOUND = "session_start_sound"
-private const val KEY_BREAK_IS_OVER_SOUND = "break_is_over"
+private const val KEY_BREAK_IS_OVER_SOUND = "break_is_over_sound"
+private const val KEY_BREAK_IS_OVER_VIBRATE = "break_is_over_vibrate"
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, SettingsRepository::class)
@@ -69,6 +74,17 @@ class SettingsRepositoryStore @Inject constructor(
     }.first()
   }
 
+  override suspend fun saveBreakIsOverVibrate(vibrate: Boolean) {
+    context.dataStore.edit { preferences ->
+      preferences.writeToggle(KEY_BREAK_IS_OVER_VIBRATE, vibrate)
+    }
+  }
+  override suspend fun getBreakIsOverVibrate(): Boolean {
+    return context.dataStore.data.map { preferences ->
+      preferences.readToggle(KEY_BREAK_IS_OVER_VIBRATE, true)
+    }.first()
+  }
+
   private fun MutablePreferences.writeRingtoneSound(key: String, sound: RingtoneSound) {
     this[stringPreferencesKey("${key}_name")] = sound.name
     this[stringPreferencesKey("${key}_uri")] = sound.uri.toString()
@@ -89,5 +105,14 @@ class SettingsRepositoryStore @Inject constructor(
       defaultValue
     }
   }
+
+  private fun MutablePreferences.writeToggle(key: String, value: Boolean) {
+    this[booleanPreferencesKey(key)] = value
+  }
+
+  private fun Preferences.readToggle(
+    key: String,
+    defaultValue: Boolean,
+  ): Boolean = get( booleanPreferencesKey(key)) ?: defaultValue
 
 }

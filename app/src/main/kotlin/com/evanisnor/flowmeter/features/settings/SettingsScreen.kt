@@ -57,6 +57,12 @@ sealed interface SettingsListViewData {
     val currentValue: String,
   ) : SettingsListViewData
 
+  data class Toggle(
+    val field: FieldId,
+    val label: String,
+    val currentValue: Boolean,
+  ) : SettingsListViewData
+
   data class DisplayValue(val label: String, val value: String) : SettingsListViewData
   data class MoreInformation(
     val field: FieldId,
