@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,11 +33,23 @@ class SoundPickerOverlay(
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
   override fun Content(navigator: OverlayNavigator<OverlayResult>) {
+    val modalBottomSheetState = rememberModalBottomSheetState(
+      skipPartiallyExpanded = state.availableSounds.size > 10
+    )
+    val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(state.currentSound) {
+      lazyListState.animateScrollToItem(state.availableSounds.indexOf(state.currentSound))
+    }
+
     ModalBottomSheet(
+      sheetState = modalBottomSheetState,
       onDismissRequest = { navigator.finish(Dismiss) },
     ) {
+
       LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        state = lazyListState,
       ) {
         items(state.availableSounds) { sound ->
           Row(
@@ -58,6 +73,7 @@ class SoundPickerOverlay(
         }
       }
     }
+
   }
 
 }

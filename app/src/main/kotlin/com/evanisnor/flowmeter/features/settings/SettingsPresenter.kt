@@ -1,5 +1,6 @@
 package com.evanisnor.flowmeter.features.settings
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
@@ -75,7 +76,6 @@ class SettingsPresenter @AssistedInject constructor(
         vibrate = settingsRepository.getBreakIsOverVibrate()
       )
     }
-
 
     val overlayResultSink: (SettingsOverlay.OverlayResult) -> Unit = { result ->
       when (result) {
