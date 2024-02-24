@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent
@@ -22,6 +23,7 @@ import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.time.Duration
@@ -36,6 +38,7 @@ class SessionContentPresenter @Inject constructor(
 
   @Composable
   override fun present(): SessionContent {
+    val scope = rememberCoroutineScope()
     val session = rememberRetained { mutableStateOf<FlowTimeSession>(NoOpFlowTimeSession) }
     val takingABreak = rememberRetained { mutableStateOf(false) }
     val breakRecommendation = rememberRetained { mutableStateOf(0.minutes) }
@@ -56,7 +59,9 @@ class SessionContentPresenter @Inject constructor(
           takingABreak.value = false
           notifyBreakIsOver.value = false
           session.value = flowTimeSessionProvider.get()
-          attentionGrabber.notifySessionStarted()
+          scope.launch {
+            attentionGrabber.notifySessionStarted()
+          }
         }
         is EndSession -> {
           session.value.stop()

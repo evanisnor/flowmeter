@@ -27,7 +27,6 @@ interface RingtoneSystem {
   fun getSounds(): List<RingtoneSound>
 
   fun getDefaultSound(): RingtoneSound
-
 }
 
 @SingleIn(AppScope::class)
@@ -49,16 +48,12 @@ class RingtoneSystemInterface @Inject constructor() : RingtoneSystem, RingtoneIn
       emptyList()
     }
 
-    defaultNotificationSound = try {
-      RingtoneManager(activity).getDefaultRingtone(RingtoneManager.TYPE_NOTIFICATION, activity)
-    } catch (e: Exception) {
-      requireNotNull(sounds.firstOrNull()) {
-        "Failed to find default notification sound and catalog available ringtones."
-      }
+    defaultNotificationSound = requireNotNull(sounds.firstOrNull()) {
+      "Failed to find default notification sound and catalog available ringtones."
     }
   }
 
-  override fun getSounds(): List<RingtoneSound> = sounds
+  override fun getSounds(): List<RingtoneSound> = sounds.toList()
 
   override fun getDefaultSound(): RingtoneSound = defaultNotificationSound
 
@@ -66,29 +61,19 @@ class RingtoneSystemInterface @Inject constructor() : RingtoneSystem, RingtoneIn
    * Why do you make me do this???
    */
   private fun RingtoneManager.extractSounds(context: Context): List<RingtoneSound> {
-    setType(RingtoneManager.TYPE_ALL)
+    setType(RingtoneManager.TYPE_NOTIFICATION)
     val cursor = this.cursor
     return buildList {
       while (cursor.moveToNext()) {
+        val position = cursor.position
         add(
           RingtoneSound(
-            name = getRingtone(cursor.position).getTitle(context),
-            uri = getRingtoneUri(cursor.position),
-          )
+            name = getRingtone(position).getTitle(context),
+            uri = getRingtoneUri(position)
+          ),
         )
       }
     }
   }
-
-  /**
-   * this is dumb
-   */
-  private fun RingtoneManager.getDefaultRingtone(type: Int, context: Context): RingtoneSound {
-    return RingtoneSound(
-      name = getRingtone(type).getTitle(context),
-      uri = getRingtoneUri(type),
-    )
-  }
-
 
 }
