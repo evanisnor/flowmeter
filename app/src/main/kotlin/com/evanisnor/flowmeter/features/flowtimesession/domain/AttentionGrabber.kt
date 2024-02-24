@@ -23,11 +23,11 @@ class AttentionGrabber @Inject constructor(
   }
 
   suspend fun notifyBreakIsOver() {
-    mediaPlayerSystem.play(settingsRepository.getBreakIsOverSound())
     notificationPublisher.post(
       NotificationPublisher.Notification(
         id = BREAK_IS_OVER_NOTIFICATION,
         title = "Break time is over!",
+        sound = settingsRepository.getBreakIsOverSound()
       )
     )
   }

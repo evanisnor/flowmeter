@@ -10,6 +10,9 @@ import com.evanisnor.flowmeter.system.NotificationSystem
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -37,7 +40,10 @@ class FlowmeterApp : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    appComponent.notificationSystem().createNotificationChannel()
+
+    CoroutineScope(Dispatchers.Main).launch {
+      appComponent.notificationSystem().createNotificationChannel()
+    }
   }
 
   fun inject(activity: MainActivity) {

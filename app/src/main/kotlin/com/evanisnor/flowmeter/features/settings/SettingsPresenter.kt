@@ -25,6 +25,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBa
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MediaPlayerSystem
+import com.evanisnor.flowmeter.system.NotificationSystem
 import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.retained.rememberRetained
@@ -46,6 +47,7 @@ class SettingsPresenter @AssistedInject constructor(
   private val ringtoneSystem: RingtoneSystem,
   private val settingsRepository: SettingsRepository,
   private val mediaPlayerSystem: MediaPlayerSystem,
+  private val notificationSystem: NotificationSystem,
 ) : Presenter<State> {
   @Composable
   override fun present(): State {
@@ -77,7 +79,13 @@ class SettingsPresenter @AssistedInject constructor(
             }
             SETTING_BREAK_IS_OVER_SOUND -> {
               breakIsOverSound.value = result.sound
-              scope.launch { settingsRepository.saveBreakIsOverSound(result.sound) }
+              scope.launch {
+                settingsRepository.saveBreakIsOverSound(result.sound)
+                notificationSystem.createNotificationChannel(settings = NotificationSystem.NotificationChannelSettings(
+                  sound = result.sound,
+                  vibrate = true,
+                ))
+              }
             }
           }
           overlay.value = null

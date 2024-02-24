@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.RingtoneManager
+import android.provider.MediaStore.Audio
 import androidx.core.app.NotificationManagerCompat
 import com.evanisnor.flowmeter.di.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -26,14 +27,15 @@ object SystemModule {
     NotificationManagerCompat.from(context)
 
   @Provides
-  fun mediaPlayer() : MediaPlayer =
+  fun audioAttributes(): AudioAttributes = AudioAttributes.Builder()
+    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+    .setUsage(AudioAttributes.USAGE_MEDIA)
+    .build()
+
+  @Provides
+  fun mediaPlayer(audioAttributes: AudioAttributes) : MediaPlayer =
     MediaPlayer().apply {
-      setAudioAttributes(
-        AudioAttributes.Builder()
-          .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-          .setUsage(AudioAttributes.USAGE_MEDIA)
-          .build()
-      )
+      setAudioAttributes(audioAttributes)
     }
 
 }
