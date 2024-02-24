@@ -24,6 +24,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.FieldSelec
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBack
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
+import com.evanisnor.flowmeter.system.MediaPlayerSystem
 import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.retained.rememberRetained
@@ -44,6 +45,7 @@ class SettingsPresenter @AssistedInject constructor(
   @Assisted private val navigator: Navigator,
   private val ringtoneSystem: RingtoneSystem,
   private val settingsRepository: SettingsRepository,
+  private val mediaPlayerSystem: MediaPlayerSystem,
 ) : Presenter<State> {
   @Composable
   override fun present(): State {
@@ -67,6 +69,7 @@ class SettingsPresenter @AssistedInject constructor(
       when (result) {
         is Dismiss -> overlay.value = null
         is SelectSound -> {
+          mediaPlayerSystem.play(result.sound)
           when(result.field) {
             SETTING_SESSION_START_SOUND -> {
               sessionStartSound.value = result.sound
