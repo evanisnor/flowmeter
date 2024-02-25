@@ -118,6 +118,8 @@ class SessionContentPresenter @Inject constructor(
               }
           } else {
             flowTimeState.toSessionContent(eventSink)
+          }.also {
+            Timber.v("Presenting $it")
           }
         }
       }

@@ -12,6 +12,7 @@ import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.di.WorkerFactory
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CompletableDeferred
+import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.UUID
 import javax.inject.Inject
@@ -54,8 +55,11 @@ class WorkManagerSystemIntegration @Inject constructor(
   }
 
   override suspend fun <T : ListenableWorker> locate(worker: KClass<T>): T {
+    val t0 = System.currentTimeMillis()
     @Suppress("UNCHECKED_CAST")
-    return workerMap.getOrPut(worker, defaultValue = { CompletableDeferred() }).await() as T
+    return (workerMap.getOrPut(worker, defaultValue = { CompletableDeferred() }).await() as T).also {
+      Timber.d("Located ${worker.simpleName} in ${System.currentTimeMillis() - t0}ms")
+    }
   }
 }
 
