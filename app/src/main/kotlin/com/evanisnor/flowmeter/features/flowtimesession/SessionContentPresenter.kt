@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import com.evanisnor.flowmeter.FeatureFlags
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.EndBreak
@@ -16,9 +17,12 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionIn
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
 import com.evanisnor.flowmeter.features.flowtimesession.domain.AttentionGrabber
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession
+import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeWorker
 import com.evanisnor.flowmeter.features.flowtimesession.domain.NoOpFlowTimeSession
 import com.evanisnor.flowmeter.features.flowtimesession.domain.TimeFormatter
+import com.evanisnor.flowmeter.features.flowtimesession.domain.startFlowTime
 import com.evanisnor.flowmeter.system.NotificationSystem
+import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
@@ -35,6 +39,7 @@ class SessionContentPresenter @Inject constructor(
   private val timeFormatter: TimeFormatter,
   private val attentionGrabber: AttentionGrabber,
   private val notificationSystem: NotificationSystem,
+  private val workManagerSystem: WorkManagerSystem,
 ) : Presenter<SessionContent> {
 
   @Composable
@@ -44,6 +49,12 @@ class SessionContentPresenter @Inject constructor(
     val takingABreak = rememberRetained { mutableStateOf(false) }
     val breakRecommendation = rememberRetained { mutableStateOf(0.minutes) }
     val notifyBreakIsOver = rememberRetained { mutableStateOf(false) }
+
+    if (FeatureFlags.FLOW_IN_WORKMANAGER) {
+      LaunchedEffect(Unit) {
+        session.value = workManagerSystem.locate(FlowTimeWorker::class)
+      }
+    }
 
     LaunchedEffect(session.value, notifyBreakIsOver.value) {
       if (notifyBreakIsOver.value) {
@@ -61,9 +72,16 @@ class SessionContentPresenter @Inject constructor(
           takingABreak.value = false
           notifyBreakIsOver.value = false
           session.value.stop()
-          session.value = flowTimeSessionProvider.get()
-          scope.launch {
-            attentionGrabber.notifySessionStarted()
+          if (!FeatureFlags.FLOW_IN_WORKMANAGER) {
+            session.value = flowTimeSessionProvider.get()
+            scope.launch {
+              attentionGrabber.notifySessionStarted()
+            }
+          } else {
+            scope.launch {
+              session.value = workManagerSystem.startFlowTime()
+              attentionGrabber.notifySessionStarted()
+            }
           }
         }
         is EndSession -> {
@@ -75,7 +93,13 @@ class SessionContentPresenter @Inject constructor(
           takingABreak.value = true
           notifyBreakIsOver.value = false
           breakRecommendation.value = event.duration
-          session.value = flowTimeSessionProvider.get()
+          if (!FeatureFlags.FLOW_IN_WORKMANAGER) {
+            session.value = flowTimeSessionProvider.get()
+          } else {
+            scope.launch {
+              session.value = workManagerSystem.startFlowTime()
+            }
+          }
         }
         is EndBreak -> {
           Timber.i("User wants break time to end")
