@@ -24,6 +24,7 @@ import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.time.Duration
@@ -55,6 +56,7 @@ class SessionContentPresenter @Inject constructor(
     val eventSink: (SessionEvent) -> Unit = { event ->
       when (event) {
         is NewSession -> {
+          Timber.i("User requested new FlowTime session")
           checkForNotificationPermission()
           takingABreak.value = false
           notifyBreakIsOver.value = false
@@ -65,17 +67,20 @@ class SessionContentPresenter @Inject constructor(
           }
         }
         is EndSession -> {
+          Timber.i("User wants session to stop")
           session.value.stop()
         }
         is TakeABreak -> {
+          Timber.i("User wants to take a break")
           takingABreak.value = true
           notifyBreakIsOver.value = false
           breakRecommendation.value = event.duration
           session.value = flowTimeSessionProvider.get()
         }
         is EndBreak -> {
-          breakRecommendation.value = 0.minutes
+          Timber.i("User wants break time to end")
           session.value.stop()
+          breakRecommendation.value = 0.minutes
         }
       }
     }
