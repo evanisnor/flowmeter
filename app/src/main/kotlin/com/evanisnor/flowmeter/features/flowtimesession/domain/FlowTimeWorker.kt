@@ -39,7 +39,9 @@ class FlowTimeWorker @AssistedInject constructor(
 
   override fun stop() {
     flowTimeSession.stop()
-    work.unlock()
+    if (work.isLocked) {
+      work.unlock()
+    }
     registrar.unregister(this)
   }
 
