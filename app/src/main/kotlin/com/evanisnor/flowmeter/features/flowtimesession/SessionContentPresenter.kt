@@ -50,15 +50,17 @@ class SessionContentPresenter @Inject constructor(
     val breakRecommendation = rememberRetained { mutableStateOf(0.minutes) }
     val notifyBreakIsOver = rememberRetained { mutableStateOf(false) }
 
+    if (FeatureFlags.FLOW_IN_WORKMANAGER) {
+      LaunchedEffect(scope) {
+          session.value = workManagerSystem.locate(FlowTimeWorker::class)
+      }
+    }
+
     LaunchedEffect(session.value, notifyBreakIsOver.value) {
       if (notifyBreakIsOver.value) {
         attentionGrabber.notifyBreakIsOver()
       } else {
         attentionGrabber.clearBreakIsOverNotification()
-      }
-
-      if (FeatureFlags.FLOW_IN_WORKMANAGER) {
-        session.value = workManagerSystem.locate(FlowTimeWorker::class)
       }
     }
 
