@@ -18,26 +18,31 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 interface WorkManagerSystem {
-  fun <T : ListenableWorker> runOnce(worker: KClass<T>)
+  suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>) : T
+  suspend fun <T : ListenableWorker> locate(worker: KClass<T>) : T
+}
+
+interface WorkerRegistrar {
   fun <T: ListenableWorker> register(worker: T)
   fun <T: ListenableWorker> unregister(worker: T)
-  suspend fun <T: ListenableWorker> locate(worker: KClass<T>) : T
 }
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, WorkManagerSystem::class)
+@ContributesBinding(AppScope::class, WorkerRegistrar::class)
 class WorkManagerSystemIntegration @Inject constructor(
   private val workManager: WorkManager
-) : WorkManagerSystem {
+) : WorkManagerSystem, WorkerRegistrar {
 
   private val workerMap : MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> = mutableMapOf()
 
-  override fun <T : ListenableWorker> runOnce(worker: KClass<T>) {
+  override suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>) : T {
     workManager.beginUniqueWork(
       worker.java.simpleName,
       ExistingWorkPolicy.REPLACE,
       OneTimeWorkRequest.Builder(worker.java).build()
     ).enqueue()
+    return locate(worker)
   }
 
   override fun <T : ListenableWorker> register(worker: T) {

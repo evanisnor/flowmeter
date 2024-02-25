@@ -7,6 +7,7 @@ import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.WorkerFactory
 import com.evanisnor.flowmeter.di.WorkerKey
 import com.evanisnor.flowmeter.system.WorkManagerSystem
+import com.evanisnor.flowmeter.system.WorkerRegistrar
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
@@ -14,7 +15,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.FlowCollector
 import java.util.concurrent.atomic.AtomicBoolean
@@ -23,10 +23,7 @@ import kotlin.time.Duration.Companion.minutes
 /**
  * Convenience function for launching [FlowTimeWorker]
  */
-suspend fun WorkManagerSystem.startFlowTime() : FlowTimeSession {
-  runOnce(FlowTimeWorker::class)
-  return locate(FlowTimeWorker::class)
-}
+suspend fun WorkManagerSystem.startFlowTime() : FlowTimeSession = runOnce(FlowTimeWorker::class)
 
 /**
  * Worker wrapper for [FlowTimeSession] so it can run persistently.
@@ -35,7 +32,7 @@ class FlowTimeWorker @AssistedInject constructor(
   @Assisted context: Context,
   @Assisted workerParameters: WorkerParameters,
   private val flowTimeSession: FlowTimeSession,
-  private val workManagerSystem: WorkManagerSystem,
+  private val registrar: WorkerRegistrar,
 ) : CoroutineWorker(context, workerParameters), FlowTimeSession {
 
   private val isRunning: AtomicBoolean = AtomicBoolean(false)
@@ -45,11 +42,11 @@ class FlowTimeWorker @AssistedInject constructor(
   override fun stop() {
     flowTimeSession.stop()
     isRunning.set(false)
-    workManagerSystem.unregister(this)
+    registrar.unregister(this)
   }
 
   override suspend fun doWork(): Result {
-    workManagerSystem.register(this)
+    registrar.register(this)
 
     // Run with a delay until stop() is called
     isRunning.set(true)
