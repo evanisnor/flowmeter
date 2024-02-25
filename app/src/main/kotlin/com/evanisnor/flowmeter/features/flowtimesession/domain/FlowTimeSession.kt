@@ -5,9 +5,13 @@ import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.S
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Complete
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Tick
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -36,8 +40,8 @@ interface FlowTimeSession : Flow<State> {
  * [FlowTimeSession] that does not do anything. Used as an initial state.
  */
 object NoOpFlowTimeSession : FlowTimeSession {
-  override suspend fun collect(collector: FlowCollector<State>) = Unit
   override fun stop() = Unit
+  override suspend fun collect(collector: FlowCollector<State>) = Unit
 }
 
 /**
@@ -49,26 +53,39 @@ class FlowTimeSessionLogic @Inject constructor(
   private val timeProvider: TimeProvider,
 ) : FlowTimeSession {
 
+  private val scope = CoroutineScope(Dispatchers.Main)
   private val isRunning: AtomicBoolean = AtomicBoolean(true)
+  private var collector : FlowCollector<State>? = null
 
-  override suspend fun collect(collector: FlowCollector<State>) {
-    val start = timeProvider.now().epochSecond.seconds
-    var sessionDuration = 0.seconds
+  init {
+    scope.launch {
+      Timber.i("Session started")
+      val start = timeProvider.now().epochSecond.seconds
+      var sessionDuration = 0.seconds
 
-    while (isRunning.get()) {
-      sessionDuration = timeProvider.now().epochSecond.seconds - start
-      collector.emit(Tick(sessionDuration))
-      delay(1.seconds)
+      while (isRunning.get()) {
+        sessionDuration = timeProvider.now().epochSecond.seconds - start
+        collector?.emit(Tick(sessionDuration))
+        delay(1.seconds)
+      }
+
+      Complete(
+        sessionDuration = sessionDuration,
+        recommendedBreak = sessionDuration.recommendedBreak(),
+      ).run {
+        collector?.emit(this)
+        Timber.i("Session complete")
+      }
     }
-
-    Complete(
-      sessionDuration = sessionDuration,
-      recommendedBreak = sessionDuration.recommendedBreak(),
-    ).run { collector.emit(this) }
   }
 
   override fun stop() {
     isRunning.set(false)
+  }
+
+  override suspend fun collect(collector: FlowCollector<State>) {
+    Timber.d("Obtained new collector")
+    this.collector = collector
   }
 
   private fun Duration.recommendedBreak(): Duration = when {
