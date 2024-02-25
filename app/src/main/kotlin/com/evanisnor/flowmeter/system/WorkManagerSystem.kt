@@ -1,6 +1,7 @@
 package com.evanisnor.flowmeter.system
 
 import android.content.Context
+import androidx.work.ExistingWorkPolicy
 import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.Operation
@@ -32,7 +33,11 @@ class WorkManagerSystemIntegration @Inject constructor(
   private val workerMap : MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> = mutableMapOf()
 
   override fun <T : ListenableWorker> runOnce(worker: KClass<T>) {
-    workManager.enqueue(OneTimeWorkRequest.Builder(worker.java).build())
+    workManager.beginUniqueWork(
+      worker.java.simpleName,
+      ExistingWorkPolicy.REPLACE,
+      OneTimeWorkRequest.Builder(worker.java).build()
+    ).enqueue()
   }
 
   override fun <T : ListenableWorker> register(worker: T) {
@@ -47,7 +52,6 @@ class WorkManagerSystemIntegration @Inject constructor(
     @Suppress("UNCHECKED_CAST")
     return workerMap.getOrPut(worker, defaultValue = { CompletableDeferred() }).await() as T
   }
-
 }
 
 /**

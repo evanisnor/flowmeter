@@ -69,8 +69,8 @@ class SessionContentPresenter @Inject constructor(
         is NewSession -> {
           Timber.i("User requested new FlowTime session")
           checkForNotificationPermission()
-          session.value.stop()
           if (!FeatureFlags.FLOW_IN_WORKMANAGER) {
+            session.value.stop()
             session.value = flowTimeSessionProvider.get()
             scope.launch {
               attentionGrabber.notifySessionStarted()

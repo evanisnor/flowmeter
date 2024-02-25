@@ -14,6 +14,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.FlowCollector
 import java.util.concurrent.atomic.AtomicBoolean
@@ -44,6 +45,7 @@ class FlowTimeWorker @AssistedInject constructor(
   override fun stop() {
     flowTimeSession.stop()
     isRunning.set(false)
+    workManagerSystem.unregister(this)
   }
 
   override suspend fun doWork(): Result {
@@ -55,9 +57,7 @@ class FlowTimeWorker @AssistedInject constructor(
       delay(1.minutes)
     }
 
-    return Result.success().also {
-      workManagerSystem.unregister(this)
-    }
+    return Result.success()
   }
 
   @AssistedFactory
