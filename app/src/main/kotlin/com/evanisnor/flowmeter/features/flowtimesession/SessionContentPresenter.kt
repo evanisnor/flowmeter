@@ -26,7 +26,8 @@ import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -42,6 +43,7 @@ class SessionContentPresenter @Inject constructor(
   private val workManagerSystem: WorkManagerSystem,
 ) : Presenter<SessionContent> {
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Composable
   override fun present(): SessionContent {
     val scope = rememberCoroutineScope()
@@ -52,7 +54,7 @@ class SessionContentPresenter @Inject constructor(
 
     if (FeatureFlags.FLOW_IN_WORKMANAGER) {
       LaunchedEffect(scope) {
-          session.value = workManagerSystem.locate(FlowTimeWorker::class)
+        session.value = workManagerSystem.locate(FlowTimeWorker::class)
       }
     }
 
@@ -110,8 +112,9 @@ class SessionContentPresenter @Inject constructor(
     }
 
     val sessionContent by produceRetainedState<SessionContent>(initialValue = StartNew(eventSink)) {
-      snapshotFlow { session.value }.collectLatest { session ->
-        session.collect { flowTimeState ->
+      snapshotFlow { session.value }
+        .flattenConcat()
+        .collect { flowTimeState ->
           value = if (takingABreak.value) {
             flowTimeState.toBreakContent(breakRecommendation.value, eventSink)
               .also {
@@ -124,7 +127,6 @@ class SessionContentPresenter @Inject constructor(
             Timber.v("Presenting $it")
           }
         }
-      }
     }
 
     return sessionContent
