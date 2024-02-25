@@ -103,6 +103,17 @@ dependencies {
   debugImplementation(libs.androidx.ui.test.manifest)
 }
 
+tasks.register<Copy>("copySupplementalText") {
+  val rawDirectory = "${project.projectDir}/src/main/res/raw"
+  from(layout.buildDirectory.file("${project.rootProject.rootDir}/PRIVACY.md"))
+  into(layout.buildDirectory.dir(rawDirectory))
+  doLast {
+    file("$rawDirectory/PRIVACY.md").renameTo(file("$rawDirectory/privacy.md"))
+  }
+}
+afterEvaluate {
+  tasks.getByName("preBuild").dependsOn("copySupplementalText")
+}
 
 /**
  * Handy function for executing shell commands and getting the output

@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+## Supplemental text duplicates
+**/src/main/res/raw/privacy.md
