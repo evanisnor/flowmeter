@@ -58,6 +58,7 @@ class SessionContentPresenter @Inject constructor(
           checkForNotificationPermission()
           takingABreak.value = false
           notifyBreakIsOver.value = false
+          session.value.stop()
           session.value = flowTimeSessionProvider.get()
           scope.launch {
             attentionGrabber.notifySessionStarted()
