@@ -2,6 +2,7 @@ package com.evanisnor.flowmeter.features.settings
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.AnnotatedString
 import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.runtime.CircuitUiEvent
 import com.slack.circuit.runtime.CircuitUiState
@@ -36,7 +37,7 @@ object SettingsOverlay {
       val availableSounds: List<RingtoneSystem.RingtoneSound>,
       val currentSound: RingtoneSystem.RingtoneSound,
     ) : State
-    data class InformationState(override val field: FieldId) : State
+    data class InformationState(override val field: FieldId, val content: AnnotatedString) : State
   }
 
   sealed interface OverlayResult {

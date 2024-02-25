@@ -1,6 +1,5 @@
 package com.evanisnor.flowmeter.features.settings
 
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
@@ -9,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import com.evanisnor.flowmeter.BuildConfig
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
@@ -27,6 +27,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.FieldSelec
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.Event.NavigateBack
 import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
+import com.evanisnor.flowmeter.system.MarkdownReader
 import com.evanisnor.flowmeter.system.MediaPlayerSystem
 import com.evanisnor.flowmeter.system.NotificationSystem
 import com.evanisnor.flowmeter.system.RingtoneSystem
@@ -39,9 +40,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 private const val SETTING_SESSION_START_SOUND = "session_start_sound"
 private const val SETTING_BREAK_IS_OVER_SOUND = "break_is_over_sound"
@@ -55,6 +53,7 @@ class SettingsPresenter @AssistedInject constructor(
   private val settingsRepository: SettingsRepository,
   private val mediaPlayerSystem: MediaPlayerSystem,
   private val notificationSystem: NotificationSystem,
+  private val markdownReader: MarkdownReader,
 ) : Presenter<State> {
   @Composable
   override fun present(): State {
@@ -129,9 +128,9 @@ class SettingsPresenter @AssistedInject constructor(
               }
             }
             INFO_PRIVACY_POLICY -> overlay.value =
-              InformationState(event.field)
+              InformationState(event.field, markdownReader.read(R.raw.privacy))
             INFO_OPEN_SOURCE_ATTRIBUTION -> overlay.value =
-              InformationState(event.field)
+              InformationState(event.field, AnnotatedString(""))
           }
         }
         is Event.OverlayResult -> {

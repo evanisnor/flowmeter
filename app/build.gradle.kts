@@ -89,6 +89,7 @@ dependencies {
   implementation(libs.sqldelight.adapters)
   implementation(libs.datastore)
   implementation(libs.timber)
+  implementation(libs.okio)
 
   implementation(libs.dagger)
   kapt(libs.dagger.compiler)
