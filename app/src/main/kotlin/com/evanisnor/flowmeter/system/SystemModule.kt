@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.provider.MediaStore.Audio
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.WorkManager
 import com.evanisnor.flowmeter.di.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -37,5 +38,8 @@ object SystemModule {
     MediaPlayer().apply {
       setAudioAttributes(audioAttributes)
     }
+
+  @Provides
+  fun workManager(context: Context) : WorkManager = WorkManager.getInstance(context)
 
 }

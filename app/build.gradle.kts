@@ -68,6 +68,7 @@ dependencies {
   implementation(libs.androidx.ui.graphics)
   implementation(libs.androidx.ui.tooling.preview)
   implementation(libs.androidx.material3)
+  implementation(libs.androidx.work)
   implementation(libs.bundles.circuit)
   implementation(libs.sqldelight.driver)
   implementation(libs.sqldelight.adapters)
