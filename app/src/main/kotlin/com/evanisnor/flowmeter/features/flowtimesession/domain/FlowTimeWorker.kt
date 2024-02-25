@@ -15,10 +15,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.FlowCollector
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.sync.Mutex
 
 /**
  * Convenience function for launching [FlowTimeWorker]
@@ -35,25 +33,19 @@ class FlowTimeWorker @AssistedInject constructor(
   private val registrar: WorkerRegistrar,
 ) : CoroutineWorker(context, workerParameters), FlowTimeSession {
 
-  private val isRunning: AtomicBoolean = AtomicBoolean(false)
+  private val work: Mutex = Mutex(locked = true)
 
   override suspend fun collect(collector: FlowCollector<FlowTimeSession.State>) = flowTimeSession.collect(collector)
 
   override fun stop() {
     flowTimeSession.stop()
-    isRunning.set(false)
+    work.unlock()
     registrar.unregister(this)
   }
 
   override suspend fun doWork(): Result {
     registrar.register(this)
-
-    // Run with a delay until stop() is called
-    isRunning.set(true)
-    while (isRunning.get()) {
-      delay(1.minutes)
-    }
-
+    work.lock()
     return Result.success()
   }
 
