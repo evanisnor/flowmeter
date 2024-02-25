@@ -16,6 +16,8 @@ import dagger.Component
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import timber.log.Timber.*
 
 
 /**
@@ -46,6 +48,10 @@ class FlowmeterApp : Application() {
 
   override fun onCreate() {
     super.onCreate()
+
+    if (BuildConfig.DEBUG) {
+      Timber.plant(DebugTree())
+    }
 
     WorkManager.initialize(
       this@FlowmeterApp,

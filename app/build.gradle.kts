@@ -19,6 +19,10 @@ android {
     versionCode = 1
     versionName = "1.0"
 
+    buildFeatures {
+      buildConfig = true
+    }
+
     vectorDrawables {
       useSupportLibrary = true
     }
@@ -73,6 +77,7 @@ dependencies {
   implementation(libs.sqldelight.driver)
   implementation(libs.sqldelight.adapters)
   implementation(libs.datastore)
+  implementation(libs.timber)
 
   implementation(libs.dagger)
   kapt(libs.dagger.compiler)
