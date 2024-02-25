@@ -69,8 +69,6 @@ class SessionContentPresenter @Inject constructor(
         is NewSession -> {
           Timber.i("User requested new FlowTime session")
           checkForNotificationPermission()
-          takingABreak.value = false
-          notifyBreakIsOver.value = false
           session.value.stop()
           if (!FeatureFlags.FLOW_IN_WORKMANAGER) {
             session.value = flowTimeSessionProvider.get()
@@ -83,6 +81,8 @@ class SessionContentPresenter @Inject constructor(
               attentionGrabber.notifySessionStarted()
             }
           }
+          takingABreak.value = false
+          notifyBreakIsOver.value = false
         }
         is EndSession -> {
           Timber.i("User wants session to stop")
@@ -113,10 +113,11 @@ class SessionContentPresenter @Inject constructor(
       snapshotFlow { session.value }.collectLatest { session ->
         session.collect { flowTimeState ->
           value = if (takingABreak.value) {
-            flowTimeState.toBreakContent(breakRecommendation.value, eventSink).also {
-              notifyBreakIsOver.value =
-                (it is SessionContent.TakingABreak && it.isBreakLongerThanRecommended)
-            }
+            flowTimeState.toBreakContent(breakRecommendation.value, eventSink)
+              .also {
+                notifyBreakIsOver.value =
+                  (it is SessionContent.TakingABreak && it.isBreakLongerThanRecommended)
+              }
           } else {
             flowTimeState.toSessionContent(eventSink)
           }
