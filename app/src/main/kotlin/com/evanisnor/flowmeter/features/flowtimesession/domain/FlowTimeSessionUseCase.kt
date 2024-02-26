@@ -4,6 +4,7 @@ import com.evanisnor.flowmeter.FeatureFlags
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionUseCase.FlowState
+import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.NotificationSystem
 import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.squareup.anvil.annotations.ContributesBinding
@@ -21,6 +22,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface FlowTimeSessionUseCase : Flow<FlowState> {
 
@@ -51,8 +53,9 @@ object NoOpFlowTimeSessionUseCase : FlowTimeSessionUseCase {
   override suspend fun beginTakeABreak() = Unit
   override fun stop() = Unit
   override suspend fun collect(collector: FlowCollector<FlowState>) = Unit
-
 }
+
+private val DEBUG_QUICK_BREAK_RECOMMENDATION = 5.seconds
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, FlowTimeSessionUseCase::class)
@@ -61,6 +64,7 @@ class RealFlowTimeSessionUseCase @Inject constructor(
   private val attentionGrabber: AttentionGrabber,
   private val notificationSystem: NotificationSystem,
   private val workManagerSystem: WorkManagerSystem,
+  private val settingsRepository: SettingsRepository,
   private val timeFormatter: TimeFormatter,
 ) : FlowTimeSessionUseCase {
 
@@ -135,7 +139,7 @@ class RealFlowTimeSessionUseCase @Inject constructor(
         // No side-effects
       }
       is FlowState.FlowComplete -> {
-        breakRecommendation.set(state.recommendedBreak)
+        breakRecommendation.set(if (settingsRepository.getDebugQuickBreaks()) DEBUG_QUICK_BREAK_RECOMMENDATION else state.recommendedBreak)
       }
       is FlowState.TakingABreak -> {
         if (state.isBreakLongerThanRecommended && !notifiedBreakIsOver.get()) {

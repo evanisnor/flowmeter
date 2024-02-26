@@ -29,11 +29,15 @@ interface SettingsRepository {
   suspend fun saveBreakIsOverVibrate(vibrate: Boolean)
   suspend fun getBreakIsOverVibrate(): Boolean
 
+  suspend fun saveDebugQuickBreaks(debugEnableQuickBreaks: Boolean)
+  suspend fun getDebugQuickBreaks(): Boolean
+
 }
 
 private const val KEY_SESSION_START_SOUND = "session_start_sound"
 private const val KEY_BREAK_IS_OVER_SOUND = "break_is_over_sound"
 private const val KEY_BREAK_IS_OVER_VIBRATE = "break_is_over_vibrate"
+private const val DEBUG_KEY_ENABLE_QUICK_BREAKS = "debug_enable_quick_breaks"
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, SettingsRepository::class)
@@ -82,6 +86,18 @@ class SettingsRepositoryStore @Inject constructor(
   override suspend fun getBreakIsOverVibrate(): Boolean {
     return context.dataStore.data.map { preferences ->
       preferences.readToggle(KEY_BREAK_IS_OVER_VIBRATE, true)
+    }.first()
+  }
+
+  override suspend fun saveDebugQuickBreaks(debugEnableQuickBreaks: Boolean) {
+    context.dataStore.edit { preferences ->
+      preferences.writeToggle(DEBUG_KEY_ENABLE_QUICK_BREAKS, debugEnableQuickBreaks)
+    }
+  }
+
+  override suspend fun getDebugQuickBreaks(): Boolean {
+    return context.dataStore.data.map { preferences ->
+      preferences.readToggle(DEBUG_KEY_ENABLE_QUICK_BREAKS, false)
     }.first()
   }
 

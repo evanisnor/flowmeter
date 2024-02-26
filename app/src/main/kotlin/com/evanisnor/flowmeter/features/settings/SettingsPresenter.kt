@@ -1,6 +1,7 @@
 package com.evanisnor.flowmeter.features.settings
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
@@ -39,6 +40,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 
 private const val SETTING_SESSION_START_SOUND = "session_start_sound"
@@ -46,6 +48,7 @@ private const val SETTING_BREAK_IS_OVER_SOUND = "break_is_over_sound"
 private const val SETTING_BREAK_IS_OVER_VIBRATE = "break_is_over_vibrate"
 private const val INFO_PRIVACY_POLICY = "privacy_policy"
 private const val INFO_OPEN_SOURCE_ATTRIBUTION = "open_source_attribution"
+private const val DEBUG_ENABLE_QUICK_BREAKS = "debug_enable_quick_breaks"
 
 class SettingsPresenter @AssistedInject constructor(
   @Assisted private val navigator: Navigator,
@@ -69,6 +72,7 @@ class SettingsPresenter @AssistedInject constructor(
         vibrate = true,
       ))
     }
+    val debugEnableQuickBreaks = rememberRetained { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
       availableSounds.value = ringtoneSystem.getSounds()
@@ -77,6 +81,7 @@ class SettingsPresenter @AssistedInject constructor(
         sound = settingsRepository.getBreakIsOverSound(),
         vibrate = settingsRepository.getBreakIsOverVibrate()
       )
+      debugEnableQuickBreaks.value = settingsRepository.getDebugQuickBreaks()
     }
 
     val overlayResultSink: (SettingsOverlay.OverlayResult) -> Unit = { result ->
@@ -131,6 +136,12 @@ class SettingsPresenter @AssistedInject constructor(
               InformationState(event.field, markdownReader.read(R.raw.privacy))
             INFO_OPEN_SOURCE_ATTRIBUTION -> overlay.value =
               InformationState(event.field, AnnotatedString(""))
+            DEBUG_ENABLE_QUICK_BREAKS -> {
+              debugEnableQuickBreaks.value = !debugEnableQuickBreaks.value
+              scope.launch {
+                settingsRepository.saveDebugQuickBreaks(debugEnableQuickBreaks.value)
+              }
+            }
           }
         }
         is Event.OverlayResult -> {
@@ -145,6 +156,7 @@ class SettingsPresenter @AssistedInject constructor(
       sessionStartSound = sessionStartSound.value,
       breakIsOverSound = breakIsOver.value.sound,
       breakIsOverVibrate = breakIsOver.value.vibrate,
+      debugEnableQuickBreaks = debugEnableQuickBreaks.value,
       eventSink = eventSink,
     )
   }
@@ -155,9 +167,10 @@ class SettingsPresenter @AssistedInject constructor(
     sessionStartSound: RingtoneSystem.RingtoneSound,
     breakIsOverSound: RingtoneSystem.RingtoneSound,
     breakIsOverVibrate: Boolean,
+    debugEnableQuickBreaks: Boolean,
     eventSink: (Event) -> Unit,
   ): State = State(
-    settingsItems = persistentListOf(
+    settingsItems = mutableListOf(
       GroupHeading(
         icon = Icons.Filled.Notifications,
         label = stringResource(R.string.settings_group_notifications)
@@ -194,7 +207,20 @@ class SettingsPresenter @AssistedInject constructor(
         field = INFO_OPEN_SOURCE_ATTRIBUTION,
         label = stringResource(R.string.settings_information_open_source_attribution)
       ),
-    ),
+    ).apply {
+      if (BuildConfig.DEBUG) {
+        // DEBUG MENU
+        listOf(
+          Divider,
+          GroupHeading(icon = Icons.Filled.Build, label = "Debug"),
+          Toggle(
+            field = DEBUG_ENABLE_QUICK_BREAKS,
+            label = "Enable Quick Breaks",
+            currentValue = debugEnableQuickBreaks,
+          )
+        ).let { addAll(it) }
+      }
+    }.toPersistentList(),
     overlayState = overlay,
     eventSink = eventSink,
   )
