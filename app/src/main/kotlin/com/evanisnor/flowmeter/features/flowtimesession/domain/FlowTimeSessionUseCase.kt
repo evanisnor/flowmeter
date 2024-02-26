@@ -68,6 +68,7 @@ class RealFlowTimeSessionUseCase @Inject constructor(
   private val state: MutableStateFlow<FlowState> = MutableStateFlow(FlowState.Idle)
 
   private val isTakingABreak = AtomicBoolean(false)
+  private val notifiedBreakIsOver = AtomicBoolean(false)
   private val breakRecommendation = AtomicReference(0.minutes)
   private val currentSession = AtomicReference<FlowTimeSession>(NoOpFlowTimeSession)
 
@@ -137,12 +138,13 @@ class RealFlowTimeSessionUseCase @Inject constructor(
         breakRecommendation.set(state.recommendedBreak)
       }
       is FlowState.TakingABreak -> {
-        if (state.isBreakLongerThanRecommended) {
+        if (state.isBreakLongerThanRecommended && !notifiedBreakIsOver.get()) {
           attentionGrabber.notifyBreakIsOver()
+          notifiedBreakIsOver.set(true)
         }
       }
       FlowState.BreakIsOver -> {
-        // No side-effects
+        notifiedBreakIsOver.set(false)
       }
     }
   }
