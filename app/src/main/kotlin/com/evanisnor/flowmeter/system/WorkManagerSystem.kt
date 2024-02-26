@@ -19,6 +19,7 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 interface WorkManagerSystem {
+  fun isRunning(worker: KClass<out ListenableWorker>) : Boolean
   suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>) : T
   suspend fun <T : ListenableWorker> locate(worker: KClass<T>) : T
 }
@@ -37,6 +38,8 @@ class WorkManagerSystemIntegration @Inject constructor(
 
   private val workerMap : MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> = mutableMapOf()
 
+  override fun isRunning(worker: KClass<out ListenableWorker>): Boolean = workerMap.contains(worker)
+
   override suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>) : T {
     workManager.beginUniqueWork(
       worker.java.simpleName,
@@ -48,10 +51,12 @@ class WorkManagerSystemIntegration @Inject constructor(
 
   override fun <T : ListenableWorker> register(worker: T) {
     workerMap.getOrPut(worker::class, defaultValue = { CompletableDeferred() }).complete(worker)
+    Timber.d("Registered Worker ${worker::class.simpleName}")
   }
 
   override fun <T : ListenableWorker> unregister(worker: T) {
     workerMap.remove(worker::class)
+    Timber.d("Unregistered Worker ${worker::class.simpleName}")
   }
 
   override suspend fun <T : ListenableWorker> locate(worker: KClass<T>): T {

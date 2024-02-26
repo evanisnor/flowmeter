@@ -2,6 +2,7 @@ package com.evanisnor.flowmeter.features.flowtimesession.domain
 
 import com.evanisnor.flowmeter.FeatureFlags
 import com.evanisnor.flowmeter.di.AppScope
+import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionUseCase.FlowState
 import com.evanisnor.flowmeter.system.NotificationSystem
 import com.evanisnor.flowmeter.system.WorkManagerSystem
@@ -45,6 +46,15 @@ interface FlowTimeSessionUseCase : Flow<FlowState> {
   fun stop()
 }
 
+object NoOpFlowTimeSessionUseCase : FlowTimeSessionUseCase {
+  override suspend fun beginFlowSession() = Unit
+  override suspend fun beginTakeABreak() = Unit
+  override fun stop() = Unit
+  override suspend fun collect(collector: FlowCollector<FlowState>) = Unit
+
+}
+
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, FlowTimeSessionUseCase::class)
 class RealFlowTimeSessionUseCase @Inject constructor(
   private val flowTimeSessionProvider: Provider<FlowTimeSession>,
