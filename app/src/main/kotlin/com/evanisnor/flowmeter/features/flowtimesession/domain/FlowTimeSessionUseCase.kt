@@ -85,6 +85,7 @@ class RealFlowTimeSessionUseCase
       checkForNotificationPermission()
       currentSession.get().stop()
       isTakingABreak.set(false)
+      attentionGrabber.clearBreakIsOverNotification()
       flowTimeSessionProvider.get().let {
         currentSession.set(it)
         collectFromSession(it)
@@ -105,6 +106,7 @@ class RealFlowTimeSessionUseCase
 
     override fun stop() {
       if (isTakingABreak.get()) {
+        attentionGrabber.clearBreakIsOverNotification()
         Timber.i("Break is over")
       } else {
         Timber.i("Flow session is complete")
