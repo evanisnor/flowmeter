@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
-import com.evanisnor.flowmeter.FeatureFlags
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEvent.EndBreak
@@ -43,11 +42,7 @@ class SessionContentPresenter
         }
 
       val reset: suspend () -> FlowTimeSessionUseCase = {
-        if (FeatureFlags.REUSE_WORK) {
-          workManagerSystem.startFlowTimeSession()
-        } else {
-          flowTimeSessionUseCase
-        }
+        workManagerSystem.startFlowTimeSession()
       }
 
       val eventSink: (SessionEvent) -> Unit = { event ->
