@@ -5,11 +5,11 @@ import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionUseCase.FlowState
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
+import com.evanisnor.flowmeter.system.MainScope
 import com.evanisnor.flowmeter.system.NotificationSystem
 import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,8 +74,8 @@ class RealFlowTimeSessionUseCase
     private val workManagerSystem: WorkManagerSystem,
     private val settingsRepository: SettingsRepository,
     private val timeFormatter: TimeFormatter,
+    @MainScope private val scope: CoroutineScope,
   ) : FlowTimeSessionUseCase {
-    private val scope = CoroutineScope(Dispatchers.Main)
     private val state: MutableStateFlow<FlowState> = MutableStateFlow(FlowState.Idle)
 
     private val isTakingABreak = AtomicBoolean(false)
@@ -95,6 +95,7 @@ class RealFlowTimeSessionUseCase
       }.let {
         currentSession.set(it)
         collectFromSession(it)
+        it.start()
       }
       attentionGrabber.notifySessionStarted()
     }
@@ -109,6 +110,7 @@ class RealFlowTimeSessionUseCase
       }.let {
         currentSession.set(it)
         collectFromSession(it)
+        it.start()
       }
     }
 

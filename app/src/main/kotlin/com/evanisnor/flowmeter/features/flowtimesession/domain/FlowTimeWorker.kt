@@ -41,6 +41,8 @@ class FlowTimeWorker
         collector,
       )
 
+    override fun start() = flowTimeSession.start()
+
     override fun stop() {
       flowTimeSession.stop()
       if (work.isLocked) {

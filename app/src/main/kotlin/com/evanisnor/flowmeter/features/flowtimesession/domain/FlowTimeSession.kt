@@ -4,9 +4,9 @@ import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Complete
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Tick
+import com.evanisnor.flowmeter.system.MainScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -31,6 +31,8 @@ interface FlowTimeSession : Flow<State> {
     ) : State
   }
 
+  fun start()
+
   fun stop()
 }
 
@@ -38,6 +40,8 @@ interface FlowTimeSession : Flow<State> {
  * [FlowTimeSession] that does not do anything. Used as an initial state.
  */
 object NoOpFlowTimeSession : FlowTimeSession {
+  override fun start() = Unit
+
   override fun stop() = Unit
 
   override suspend fun collect(collector: FlowCollector<State>) = Unit
@@ -52,12 +56,12 @@ class FlowTimeSessionLogic
   @Inject
   constructor(
     private val timeProvider: TimeProvider,
+    @MainScope private val scope: CoroutineScope,
   ) : FlowTimeSession {
-    private val scope = CoroutineScope(Dispatchers.Main)
     private val isRunning: AtomicBoolean = AtomicBoolean(true)
     private var collector: FlowCollector<State>? = null
 
-    init {
+    override fun start() {
       scope.launch {
         Timber.i("Session started")
         val start = timeProvider.now().epochSecond.seconds
