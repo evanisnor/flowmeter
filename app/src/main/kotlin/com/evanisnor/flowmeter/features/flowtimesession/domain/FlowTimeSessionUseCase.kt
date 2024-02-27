@@ -1,6 +1,5 @@
 package com.evanisnor.flowmeter.features.flowtimesession.domain
 
-import com.evanisnor.flowmeter.FeatureFlags
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionUseCase.FlowState
@@ -88,11 +87,7 @@ class RealFlowTimeSessionUseCase
       checkForNotificationPermission()
       currentSession.get().stop()
       isTakingABreak.set(false)
-      if (FeatureFlags.FLOW_IN_WORKMANAGER) {
-        workManagerSystem.startFlowTime()
-      } else {
-        flowTimeSessionProvider.get()
-      }.let {
+      flowTimeSessionProvider.get().let {
         currentSession.set(it)
         collectFromSession(it)
         it.start()
@@ -103,11 +98,7 @@ class RealFlowTimeSessionUseCase
     override suspend fun beginTakeABreak() {
       Timber.i("Taking a break")
       isTakingABreak.set(true)
-      if (FeatureFlags.FLOW_IN_WORKMANAGER) {
-        workManagerSystem.startFlowTime()
-      } else {
-        flowTimeSessionProvider.get()
-      }.let {
+      flowTimeSessionProvider.get().let {
         currentSession.set(it)
         collectFromSession(it)
         it.start()
