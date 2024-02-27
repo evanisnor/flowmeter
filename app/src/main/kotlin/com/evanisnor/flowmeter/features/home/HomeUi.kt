@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.evanisnor.flowmeter.FeatureFlags
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
@@ -57,13 +56,11 @@ fun HomeUi(
         TopAppBar(
           title = { AppTitle() },
           actions = {
-            if (FeatureFlags.SETTINGS) {
-              IconButton(onClick = { state.eventSink(OpenSettings) }) {
-                Icon(
-                  imageVector = Icons.TwoTone.Settings,
-                  contentDescription = stringResource(R.string.screen_settings),
-                )
-              }
+            IconButton(onClick = { state.eventSink(OpenSettings) }) {
+              Icon(
+                imageVector = Icons.TwoTone.Settings,
+                contentDescription = stringResource(R.string.screen_settings),
+              )
             }
           },
         )
