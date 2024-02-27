@@ -9,6 +9,7 @@ plugins {
   alias(libs.plugins.anvil)
   alias(libs.plugins.sqldelight)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.kotlinter)
 }
 
 android {
@@ -104,6 +105,16 @@ dependencies {
   debugImplementation(libs.androidx.ui.test.manifest)
 }
 
+buildscript {
+  dependencies {
+    classpath("com.twitter.compose.rules:ktlint:${libs.versions.composerules.get()}")
+  }
+}
+
+tasks.check {
+  dependsOn("installKotlinterPrePushHook")
+}
+
 tasks.register<Copy>("copySupplementalText") {
   val rawDirectory = "${project.projectDir}/src/main/res/raw"
   from(layout.buildDirectory.file("${project.rootProject.rootDir}/PRIVACY.md"))
@@ -112,6 +123,7 @@ tasks.register<Copy>("copySupplementalText") {
     file("$rawDirectory/PRIVACY.md").renameTo(file("$rawDirectory/privacy.md"))
   }
 }
+
 afterEvaluate {
   tasks.getByName("preBuild").dependsOn("copySupplementalText")
 }

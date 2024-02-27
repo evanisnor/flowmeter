@@ -18,6 +18,8 @@ datastore = "1.0.0"
 work = "2.9.0"
 timber = "5.0.1"
 okio = "3.8.0"
+kotlinter = "4.2.0"
+composerules = "0.0.26"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +49,7 @@ kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name="kotlinx-corout
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref="datastore" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref="timber" }
 okio = { group = "com.squareup.okio", name ="okio", version.ref="okio" }
+composerules = { group = "com.twitter.compose.rules", name ="ktlint", version.ref="composerules" }
 
 [bundles]
 circuit = [
@@ -64,4 +67,5 @@ jetbrains-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", ver
 anvil = { id = "com.squareup.anvil", version.ref="anvil" }
 sqldelight = { id = "app.cash.sqldelight", version.ref="sqldelight" }
 ksp = {id ="com.google.devtools.ksp", version.ref="ksp"}
+kotlinter = {id ="org.jmailen.kotlinter", version.ref="kotlinter"}
 
