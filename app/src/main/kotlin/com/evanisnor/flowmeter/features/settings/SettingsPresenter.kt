@@ -213,10 +213,13 @@ class SettingsPresenter
               // DEBUG MENU
               listOf(
                 Divider,
-                GroupHeading(icon = Icons.Filled.Build, label = "Debug"),
+                GroupHeading(
+                  icon = Icons.Filled.Build,
+                  label = stringResource(R.string.settings_group_debug),
+                ),
                 Toggle(
                   field = DEBUG_ENABLE_QUICK_BREAKS,
-                  label = "Enable Quick Breaks",
+                  label = stringResource(R.string.settings_debug_enable_quick_breaks),
                   currentValue = debugEnableQuickBreaks,
                 ),
               ).let { addAll(it) }

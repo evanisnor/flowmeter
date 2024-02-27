@@ -1,16 +1,17 @@
 <resources>
-    <string name="app_name">flowmeter</string>
-    <string name="notification_channel_session">Flow Session</string>
-    <string name="notification_channel_session_description">Get notified of Flow Session events, like when break time is over.</string>
+  <string name="app_name">flowmeter</string>
+  <string name="notification_channel_session">Flow Session</string>
+  <string name="notification_channel_session_description">Get notified of Flow Session events, like when break time is over.</string>
 
-    <string name="screen_settings">Settings</string>
-    <string name="screen_settings_back">Back to Flowmeter Home</string>
-    <string name="settings_group_notifications">Notifications</string>
-    <string name="settings_notification_session_start">Session start</string>
-    <string name="settings_notification_break_is_over">Break is over</string>
-    <string name="settings_notification_break_is_over_vibrate">Vibrate when break is over?</string>
-    <string name="settings_group_information">Information</string>
-    <string name="settings_information_app_version">App version</string>
-    <string name="settings_information_privacy_policy">Privacy policy</string>
-    <string name="settings_information_open_source_attribution">Open source attribution</string>
+  <string name="screen_settings">Settings</string>
+  <string name="screen_settings_back">Back to Flowmeter Home</string>
+  <string name="settings_group_notifications">Notifications</string>
+  <string name="settings_notification_session_start">Session start</string>
+  <string name="settings_notification_break_is_over">Break is over</string>
+  <string name="settings_notification_break_is_over_vibrate">Vibrate when break is over?</string>
+  <string name="settings_group_information">Information</string>
+  <string name="settings_information_app_version">App version</string>
+  <string name="settings_information_privacy_policy">Privacy policy</string>
+  <string name="settings_group_debug">Debug</string>
+  <string name="settings_debug_enable_quick_breaks">Enable Quick Breaks</string>
 </resources>
