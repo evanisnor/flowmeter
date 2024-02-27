@@ -1,24 +1,20 @@
 root = true
-ktlint_code_style = official
-ktlint_experimental = enabled
 
 [*]
 indent_style = space
 indent_size = 2
-
 end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 max_line_length = 100
 
-[*.{java,kt,kts,scala,rs,xml,kt.spec,kts.spec}]
-indent_size = 2
-
 [*.{kt,kts}]
-no-wildcard-imports=true
-ij_kotlin_allow_trailing_comma=true
-ij_kotlin_allow_trailing_comma_on_call_site=true
+no-wildcard-imports = true
+ij_continuation_indent_size = 2
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ktlint_function_naming_ignore_when_annotated_with=Composable
 
 [*.md]
 trim_trailing_whitespace = false

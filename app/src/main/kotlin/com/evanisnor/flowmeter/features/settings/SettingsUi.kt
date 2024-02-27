@@ -54,13 +54,14 @@ fun SettingsUi(
 ) {
   FlowmeterTheme {
     Scaffold(
+      modifier = modifier,
       topBar = {
         TopBar(onNavigateBack = { state.eventSink(NavigateBack) })
       },
     ) { padding ->
       SettingsList(
         modifier =
-          modifier
+          Modifier
             .padding(padding)
             .consumeWindowInsets(padding)
             .fillMaxWidth(),

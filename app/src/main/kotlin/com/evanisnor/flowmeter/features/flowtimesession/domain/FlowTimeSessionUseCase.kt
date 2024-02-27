@@ -147,7 +147,11 @@ class RealFlowTimeSessionUseCase
         }
         is FlowState.FlowComplete -> {
           breakRecommendation.set(
-            if (settingsRepository.getDebugQuickBreaks()) DEBUG_QUICK_BREAK_RECOMMENDATION else state.recommendedBreak,
+            if (settingsRepository.getDebugQuickBreaks()) {
+              DEBUG_QUICK_BREAK_RECOMMENDATION
+            } else {
+              state.recommendedBreak
+            },
           )
         }
         is FlowState.TakingABreak -> {

@@ -16,3 +16,6 @@ local.properties
 
 ## Supplemental text duplicates
 **/src/main/res/raw/privacy.md
+
+## ktlint ruleset jars
+rulesets

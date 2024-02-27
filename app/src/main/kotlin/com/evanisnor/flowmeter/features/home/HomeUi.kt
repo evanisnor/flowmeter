@@ -52,6 +52,7 @@ fun HomeUi(
 ) {
   FlowmeterTheme {
     Scaffold(
+      modifier = modifier,
       topBar = {
         TopAppBar(
           title = { AppTitle() },
@@ -69,7 +70,7 @@ fun HomeUi(
       },
     ) { innerPadding ->
       val screenModifier =
-        modifier
+        Modifier
           .padding(innerPadding)
           .fillMaxSize()
 
@@ -118,9 +119,9 @@ fun HomeUi(
 
 @Composable
 private fun AppTitle(modifier: Modifier = Modifier) {
-  Row {
+  Row(modifier = modifier) {
     Icon(
-      modifier = modifier.padding(horizontal = 4.dp),
+      modifier = Modifier.padding(horizontal = 4.dp),
       imageVector = Icons.TwoTone.DateRange,
       contentDescription = null,
     )

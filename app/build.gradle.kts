@@ -105,12 +105,6 @@ dependencies {
   debugImplementation(libs.androidx.ui.test.manifest)
 }
 
-buildscript {
-  dependencies {
-    classpath("com.twitter.compose.rules:ktlint:${libs.versions.composerules.get()}")
-  }
-}
-
 tasks.register<Copy>("copySupplementalText") {
   val rawDirectory = "${project.projectDir}/src/main/res/raw"
   from(layout.buildDirectory.file("${project.rootProject.rootDir}/PRIVACY.md"))
@@ -121,7 +115,12 @@ tasks.register<Copy>("copySupplementalText") {
 }
 
 afterEvaluate {
-  tasks.getByName("preBuild").dependsOn("copySupplementalText")
+  tasks {
+    getByName("preBuild").dependsOn("copySupplementalText")
+    check {
+      dependsOn("installKotlinterPrePushHook")
+    }
+  }
 }
 
 /**

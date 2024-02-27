@@ -38,7 +38,8 @@ class WorkManagerSystemIntegration
     private val workManager: WorkManager,
   ) : WorkManagerSystem, WorkerRegistrar {
     private val workerMap:
-      MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> = mutableMapOf()
+      MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> =
+      mutableMapOf()
 
     override fun isRunning(worker: KClass<out ListenableWorker>): Boolean =
       workerMap.contains(

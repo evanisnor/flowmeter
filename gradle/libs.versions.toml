@@ -19,7 +19,7 @@ work = "2.9.0"
 timber = "5.0.1"
 okio = "3.8.0"
 kotlinter = "4.2.0"
-composerules = "0.0.26"
+composerules = "0.3.11"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,7 +49,7 @@ kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name="kotlinx-corout
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref="datastore" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref="timber" }
 okio = { group = "com.squareup.okio", name ="okio", version.ref="okio" }
-composerules = { group = "com.twitter.compose.rules", name ="ktlint", version.ref="composerules" }
+composerules = { group = "io.nlopez.compose.rules", name ="ktlint", version.ref="composerules" }
 
 [bundles]
 circuit = [

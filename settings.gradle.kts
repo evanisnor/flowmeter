@@ -18,6 +18,14 @@ dependencyResolutionManagement {
     mavenCentral()
   }
 }
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("io.nlopez.compose.rules:ktlint:0.3.11")
+  }
+}
 
 rootProject.name = "flowmeter"
 include(":app")
