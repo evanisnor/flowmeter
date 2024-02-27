@@ -36,7 +36,10 @@ class FlowTimeWorker
   ) : CoroutineWorker(context, workerParameters), FlowTimeSession {
     private val work: Mutex = Mutex(locked = true)
 
-    override suspend fun collect(collector: FlowCollector<FlowTimeSession.State>) = flowTimeSession.collect(collector)
+    override suspend fun collect(collector: FlowCollector<FlowTimeSession.State>) =
+      flowTimeSession.collect(
+        collector,
+      )
 
     override fun stop() {
       flowTimeSession.stop()

@@ -34,7 +34,8 @@ object SystemModule {
   fun ringtoneManager(context: Context): RingtoneManager = RingtoneManager(context)
 
   @Provides
-  fun notificationManager(context: Context): NotificationManagerCompat = NotificationManagerCompat.from(context)
+  fun notificationManager(context: Context): NotificationManagerCompat =
+    NotificationManagerCompat.from(context)
 
   @Provides
   fun audioAttributes(): AudioAttributes =

@@ -83,7 +83,9 @@ class NotificationSystemInterface
     private val intentProvider: IntentProvider,
   ) : NotificationSystem, NotificationPublisher {
     private var permissionRequestLauncher: ActivityResultLauncher<String>? = null
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "notifications")
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+      name = "notifications",
+    )
     private val notificationChannelIdKey = stringPreferencesKey("notification_channel_id")
 
     override fun isNotificationPermissionGranted(): Boolean {
@@ -101,7 +103,9 @@ class NotificationSystemInterface
       permissionRequestLauncher?.launch(POST_NOTIFICATIONS)
     }
 
-    override suspend fun createNotificationChannel(settings: NotificationSystem.NotificationChannelSettings?) {
+    override suspend fun createNotificationChannel(
+      settings: NotificationSystem.NotificationChannelSettings?,
+    ) {
       val existingChannelId = notificationChannelId()
       if (existingChannelId != null && settings == null) {
         return

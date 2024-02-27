@@ -8,7 +8,9 @@ class TimeFormatter
   constructor() {
     fun humanReadableClock(duration: Duration): String {
       return if (duration.inWholeHours > 0) {
-        "${duration.inWholeHours}:${format(duration.inWholeMinutes % 60)}:${format(duration.inWholeSeconds % 60)}"
+        "${duration.inWholeHours}:${format(
+          duration.inWholeMinutes % 60,
+        )}:${format(duration.inWholeSeconds % 60)}"
       } else {
         "${duration.inWholeMinutes}:${format(duration.inWholeSeconds % 60)}"
       }
@@ -16,7 +18,9 @@ class TimeFormatter
 
     fun humanReadableSentence(duration: Duration): String {
       return if (duration.inWholeHours >= 1L) {
-        "${humanReadableHours(duration.inWholeHours)} and ${humanReadableMinutes(duration.inWholeMinutes % 60)}"
+        "${humanReadableHours(
+          duration.inWholeHours,
+        )} and ${humanReadableMinutes(duration.inWholeMinutes % 60)}"
       } else if (duration.inWholeMinutes >= 1L) {
         humanReadableMinutes(duration.inWholeMinutes)
       } else {

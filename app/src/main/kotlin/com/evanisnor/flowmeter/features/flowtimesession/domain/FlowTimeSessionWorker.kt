@@ -43,7 +43,10 @@ class FlowTimeSessionWorker
 
     override suspend fun beginTakeABreak() = flowTimeSessionUseCase.beginTakeABreak()
 
-    override suspend fun collect(collector: FlowCollector<FlowTimeSessionUseCase.FlowState>) = flowTimeSessionUseCase.collect(collector)
+    override suspend fun collect(collector: FlowCollector<FlowTimeSessionUseCase.FlowState>) =
+      flowTimeSessionUseCase.collect(
+        collector,
+      )
 
     override fun stop() {
       flowTimeSessionUseCase.stop()

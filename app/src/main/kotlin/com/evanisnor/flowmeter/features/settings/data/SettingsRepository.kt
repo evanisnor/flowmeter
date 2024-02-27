@@ -122,7 +122,10 @@ class SettingsRepositoryStore
       return if (contains(nameKey) && contains(uriKey)) {
         RingtoneSound(
           name = requireNotNull(get(nameKey)) { "Failed to retrieve $nameKey from datastore" },
-          uri = requireNotNull(get(uriKey)) { "Failed to retrieve $uriKey from datastore" }.let { Uri.parse(it) },
+          uri =
+            requireNotNull(get(uriKey)) {
+              "Failed to retrieve $uriKey from datastore"
+            }.let { Uri.parse(it) },
         )
       } else {
         defaultValue

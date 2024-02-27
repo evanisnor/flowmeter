@@ -37,9 +37,13 @@ class WorkManagerSystemIntegration
   constructor(
     private val workManager: WorkManager,
   ) : WorkManagerSystem, WorkerRegistrar {
-    private val workerMap: MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> = mutableMapOf()
+    private val workerMap:
+      MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> = mutableMapOf()
 
-    override fun isRunning(worker: KClass<out ListenableWorker>): Boolean = workerMap.contains(worker)
+    override fun isRunning(worker: KClass<out ListenableWorker>): Boolean =
+      workerMap.contains(
+        worker,
+      )
 
     override suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>): T {
       workManager.beginUniqueWork(
@@ -63,7 +67,12 @@ class WorkManagerSystemIntegration
     override suspend fun <T : ListenableWorker> locate(worker: KClass<T>): T {
       val t0 = System.currentTimeMillis()
       @Suppress("UNCHECKED_CAST")
-      return (workerMap.getOrPut(worker, defaultValue = { CompletableDeferred() }).await() as T).also {
+      return (
+        workerMap.getOrPut(
+          worker,
+          defaultValue = { CompletableDeferred() },
+        ).await() as T
+      ).also {
         Timber.d("Located ${worker.simpleName} in ${System.currentTimeMillis() - t0}ms")
       }
     }
@@ -75,7 +84,8 @@ class WorkManagerSystemIntegration
 class WorkerFactoryFactory
   @Inject
   constructor(
-    private val workerFactories: Map<Class<out ListenableWorker>, @JvmSuppressWildcards WorkerFactory<*>>,
+    private val workerFactories:
+      Map<Class<out ListenableWorker>, @JvmSuppressWildcards WorkerFactory<*>>,
   ) : androidx.work.WorkerFactory() {
     override fun createWorker(
       appContext: Context,

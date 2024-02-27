@@ -67,7 +67,10 @@ class SessionContentPresenter
         }
       }
 
-      val sessionContent by produceRetainedState<SessionContent>(initialValue = StartNew(eventSink), key1 = session.value) {
+      val sessionContent by produceRetainedState<SessionContent>(
+        initialValue = StartNew(eventSink),
+        key1 = session.value,
+      ) {
         snapshotFlow { session.value }.flattenConcat().collect { flowState ->
           value =
             when (flowState) {

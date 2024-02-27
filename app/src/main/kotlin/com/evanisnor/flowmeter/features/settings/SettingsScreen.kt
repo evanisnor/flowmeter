@@ -42,7 +42,10 @@ object SettingsOverlay {
   }
 
   sealed interface OverlayResult {
-    data class SelectSound(val field: FieldId, val sound: RingtoneSystem.RingtoneSound) : OverlayResult
+    data class SelectSound(
+      val field: FieldId,
+      val sound: RingtoneSystem.RingtoneSound,
+    ) : OverlayResult
 
     data object Dismiss : OverlayResult
   }
