@@ -111,10 +111,6 @@ buildscript {
   }
 }
 
-tasks.check {
-  dependsOn("installKotlinterPrePushHook")
-}
-
 tasks.register<Copy>("copySupplementalText") {
   val rawDirectory = "${project.projectDir}/src/main/res/raw"
   from(layout.buildDirectory.file("${project.rootProject.rootDir}/PRIVACY.md"))
