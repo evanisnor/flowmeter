@@ -46,10 +46,12 @@ import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 import kotlinx.collections.immutable.persistentListOf
 
-
 @CircuitInject(SettingsScreen::class, AppScope::class)
 @Composable
-fun SettingsUi(state: State, modifier: Modifier = Modifier) {
+fun SettingsUi(
+  state: State,
+  modifier: Modifier = Modifier,
+) {
   FlowmeterTheme {
     Scaffold(
       topBar = {
@@ -57,19 +59,21 @@ fun SettingsUi(state: State, modifier: Modifier = Modifier) {
       },
     ) { padding ->
       SettingsList(
-        modifier = modifier
-          .padding(padding)
-          .consumeWindowInsets(padding)
-          .fillMaxWidth(),
+        modifier =
+          modifier
+            .padding(padding)
+            .consumeWindowInsets(padding)
+            .fillMaxWidth(),
         state = state,
         onFieldSelected = { field ->
           state.eventSink(SettingsScreen.Event.FieldSelected(field))
-        }
+        },
       )
 
       SettingsOverlayUi(
         state = state.overlayState,
-        onResult = { state.eventSink(SettingsScreen.Event.OverlayResult(it)) })
+        onResult = { state.eventSink(SettingsScreen.Event.OverlayResult(it)) },
+      )
     }
   }
 }
@@ -81,7 +85,7 @@ private fun TopBar(onNavigateBack: () -> Unit) {
       IconButton(onClick = onNavigateBack) {
         Icon(
           imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-          contentDescription = stringResource(R.string.screen_settings_back)
+          contentDescription = stringResource(R.string.screen_settings_back),
         )
       }
     },
@@ -110,21 +114,24 @@ private fun SettingsList(
         is Divider -> HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         is GroupHeading -> ColumnItem { GroupHeadingItem(it) }
         is DisplayValue -> ColumnItem { DisplayValueItem(it) }
-        is Setting -> ColumnItem(
-          modifier = Modifier.clickable { onFieldSelected(it.field) }
-        ) {
-          SettingItem(it)
-        }
-        is Toggle -> ColumnItem(
-          modifier = Modifier.clickable { onFieldSelected(it.field) }
-        ) {
-          ToggleItem(it, onCheckedChange = {_ ->onFieldSelected(it.field)})
-        }
-        is MoreInformation -> ColumnItem(
-          modifier = Modifier.clickable { onFieldSelected(it.field) }
-        ) {
-          MoreInformationItem(it)
-        }
+        is Setting ->
+          ColumnItem(
+            modifier = Modifier.clickable { onFieldSelected(it.field) },
+          ) {
+            SettingItem(it)
+          }
+        is Toggle ->
+          ColumnItem(
+            modifier = Modifier.clickable { onFieldSelected(it.field) },
+          ) {
+            ToggleItem(it, onCheckedChange = { _ -> onFieldSelected(it.field) })
+          }
+        is MoreInformation ->
+          ColumnItem(
+            modifier = Modifier.clickable { onFieldSelected(it.field) },
+          ) {
+            MoreInformationItem(it)
+          }
       }
     }
   }
@@ -134,12 +141,16 @@ private fun SettingsList(
  * For consistent styling of items in the LazyColumn
  */
 @Composable
-private fun ColumnItem(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+private fun ColumnItem(
+  modifier: Modifier = Modifier,
+  content: @Composable () -> Unit,
+) {
   Box(
-    modifier = modifier
-      .defaultMinSize(minHeight = 52.dp)
-      .padding(horizontal = 16.dp)
-      .fillMaxWidth(),
+    modifier =
+      modifier
+        .defaultMinSize(minHeight = 52.dp)
+        .padding(horizontal = 16.dp)
+        .fillMaxWidth(),
     contentAlignment = Alignment.CenterStart,
   ) {
     content()
@@ -147,7 +158,10 @@ private fun ColumnItem(modifier: Modifier = Modifier, content: @Composable () ->
 }
 
 @Composable
-private fun GroupHeadingItem(groupHeading: GroupHeading, modifier: Modifier = Modifier) {
+private fun GroupHeadingItem(
+  groupHeading: GroupHeading,
+  modifier: Modifier = Modifier,
+) {
   Row(
     modifier = modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
@@ -161,7 +175,10 @@ private fun GroupHeadingItem(groupHeading: GroupHeading, modifier: Modifier = Mo
 }
 
 @Composable
-private fun SettingItem(setting: Setting, modifier: Modifier = Modifier) {
+private fun SettingItem(
+  setting: Setting,
+  modifier: Modifier = Modifier,
+) {
   Column(
     modifier = modifier.fillMaxWidth(),
   ) {
@@ -178,7 +195,11 @@ private fun SettingItem(setting: Setting, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ToggleItem(toggle: Toggle, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+private fun ToggleItem(
+  toggle: Toggle,
+  onCheckedChange: (Boolean) -> Unit,
+  modifier: Modifier = Modifier,
+) {
   Row(
     modifier = modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
@@ -196,7 +217,10 @@ private fun ToggleItem(toggle: Toggle, onCheckedChange: (Boolean) -> Unit, modif
 }
 
 @Composable
-private fun DisplayValueItem(displayValue: DisplayValue, modifier: Modifier = Modifier) {
+private fun DisplayValueItem(
+  displayValue: DisplayValue,
+  modifier: Modifier = Modifier,
+) {
   Column(
     modifier = modifier.fillMaxWidth(),
   ) {
@@ -213,7 +237,10 @@ private fun DisplayValueItem(displayValue: DisplayValue, modifier: Modifier = Mo
 }
 
 @Composable
-private fun MoreInformationItem(moreInformation: MoreInformation, modifier: Modifier = Modifier) {
+private fun MoreInformationItem(
+  moreInformation: MoreInformation,
+  modifier: Modifier = Modifier,
+) {
   Text(
     modifier = modifier.fillMaxWidth(),
     text = moreInformation.label,
@@ -224,39 +251,43 @@ private fun MoreInformationItem(moreInformation: MoreInformation, modifier: Modi
 @PreviewLightDark
 @Composable
 private fun SettingsUiPreview() {
-  SettingsUi(state = State(
-    settingsItems = persistentListOf(
-      GroupHeading(icon = Icons.Filled.Notifications, label = "Notifications"),
-      Setting(
-        field = "",
-        label = "Sound one",
-        currentValue = "Ringtone 1"
+  SettingsUi(
+    state =
+      State(
+        settingsItems =
+          persistentListOf(
+            GroupHeading(icon = Icons.Filled.Notifications, label = "Notifications"),
+            Setting(
+              field = "",
+              label = "Sound one",
+              currentValue = "Ringtone 1",
+            ),
+            Setting(
+              field = "",
+              label = "Sound two",
+              currentValue = "Ringtone 2",
+            ),
+            Toggle(
+              field = "",
+              label = "Vibrate?",
+              currentValue = true,
+            ),
+            Divider,
+            GroupHeading(icon = Icons.Filled.Info, label = "Information"),
+            DisplayValue(
+              label = "App version",
+              value = "0.1.0",
+            ),
+            MoreInformation(
+              field = "",
+              label = "Privacy policy",
+            ),
+            MoreInformation(
+              field = "",
+              label = "Open source attribution",
+            ),
+          ),
+        eventSink = {},
       ),
-      Setting(
-        field = "",
-        label = "Sound two",
-        currentValue = "Ringtone 2"
-      ),
-      Toggle(
-        field = "",
-        label = "Vibrate?",
-        currentValue = true
-      ),
-      Divider,
-      GroupHeading(icon = Icons.Filled.Info, label = "Information"),
-      DisplayValue(
-        label = "App version",
-        value = "0.1.0",
-      ),
-      MoreInformation(
-        field = "",
-        label = "Privacy policy"
-      ),
-      MoreInformation(
-        field = "",
-        label = "Open source attribution"
-      ),
-    ),
-    eventSink = {}
-  ))
+  )
 }

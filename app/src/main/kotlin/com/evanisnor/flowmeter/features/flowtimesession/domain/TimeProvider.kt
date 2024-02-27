@@ -8,19 +8,20 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
 interface TimeProvider {
-  fun now() : Instant
+  fun now(): Instant
 }
 
 @ContributesBinding(AppScope::class, TimeProvider::class)
-class RealTimeProvider @Inject constructor() : TimeProvider {
-  override fun now(): Instant = Instant.now()
-}
+class RealTimeProvider
+  @Inject
+  constructor() : TimeProvider {
+    override fun now(): Instant = Instant.now()
+  }
 
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 class FakeTimeProvider(
   private var now: Instant = Instant.ofEpochSecond(0L),
 ) : TimeProvider {
-
   override fun now(): Instant = now
 
   fun setSeconds(seconds: Int) {

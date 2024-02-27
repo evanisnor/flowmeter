@@ -18,14 +18,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-
 /**
  * Flow tracking session!
  */
 interface FlowTimeSession : Flow<State> {
-
   sealed interface State {
     data class Tick(val duration: Duration) : State
+
     data class Complete(
       val sessionDuration: Duration,
       val recommendedBreak: Duration,
@@ -33,7 +32,6 @@ interface FlowTimeSession : Flow<State> {
   }
 
   fun stop()
-
 }
 
 /**
@@ -41,6 +39,7 @@ interface FlowTimeSession : Flow<State> {
  */
 object NoOpFlowTimeSession : FlowTimeSession {
   override fun stop() = Unit
+
   override suspend fun collect(collector: FlowCollector<State>) = Unit
 }
 
@@ -49,51 +48,52 @@ object NoOpFlowTimeSession : FlowTimeSession {
  * https://www.insightful.io/blog/flowtime-pomodoro-alternative
  */
 @ContributesBinding(AppScope::class, FlowTimeSession::class)
-class FlowTimeSessionLogic @Inject constructor(
-  private val timeProvider: TimeProvider,
-) : FlowTimeSession {
+class FlowTimeSessionLogic
+  @Inject
+  constructor(
+    private val timeProvider: TimeProvider,
+  ) : FlowTimeSession {
+    private val scope = CoroutineScope(Dispatchers.Main)
+    private val isRunning: AtomicBoolean = AtomicBoolean(true)
+    private var collector: FlowCollector<State>? = null
 
-  private val scope = CoroutineScope(Dispatchers.Main)
-  private val isRunning: AtomicBoolean = AtomicBoolean(true)
-  private var collector : FlowCollector<State>? = null
+    init {
+      scope.launch {
+        Timber.i("Session started")
+        val start = timeProvider.now().epochSecond.seconds
+        var sessionDuration = 0.seconds
 
-  init {
-    scope.launch {
-      Timber.i("Session started")
-      val start = timeProvider.now().epochSecond.seconds
-      var sessionDuration = 0.seconds
+        while (isRunning.get()) {
+          sessionDuration = timeProvider.now().epochSecond.seconds - start
+          collector?.emit(Tick(sessionDuration))
+          delay(1.seconds)
+        }
 
-      while (isRunning.get()) {
-        sessionDuration = timeProvider.now().epochSecond.seconds - start
-        collector?.emit(Tick(sessionDuration))
-        delay(1.seconds)
-      }
-
-      Complete(
-        sessionDuration = sessionDuration,
-        recommendedBreak = sessionDuration.recommendedBreak(),
-      ).run {
-        collector?.emit(this)
-        Timber.i("Session complete")
+        Complete(
+          sessionDuration = sessionDuration,
+          recommendedBreak = sessionDuration.recommendedBreak(),
+        ).run {
+          collector?.emit(this)
+          Timber.i("Session complete")
+        }
       }
     }
-  }
 
-  override fun stop() {
-    isRunning.set(false)
-  }
+    override fun stop() {
+      isRunning.set(false)
+    }
 
-  override suspend fun collect(collector: FlowCollector<State>) {
-    Timber.d("Obtained new collector")
-    this.collector = collector
-  }
+    override suspend fun collect(collector: FlowCollector<State>) {
+      Timber.d("Obtained new collector")
+      this.collector = collector
+    }
 
-  private fun Duration.recommendedBreak(): Duration = when {
-    this < 25.minutes -> 5.minutes
-    this < 50.minutes -> 8.minutes
-    this < 90.minutes -> 10.minutes
-    this < 120.minutes -> 15.minutes
-    else -> 20.minutes
+    private fun Duration.recommendedBreak(): Duration =
+      when {
+        this < 25.minutes -> 5.minutes
+        this < 50.minutes -> 8.minutes
+        this < 90.minutes -> 10.minutes
+        this < 120.minutes -> 15.minutes
+        else -> 20.minutes
+      }
   }
-
-}

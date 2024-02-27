@@ -29,13 +29,13 @@ import com.slack.circuit.overlay.OverlayNavigator
 class SoundPickerOverlay(
   private val state: SoundPickerState,
 ) : Overlay<OverlayResult> {
-
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
   override fun Content(navigator: OverlayNavigator<OverlayResult>) {
-    val modalBottomSheetState = rememberModalBottomSheetState(
-      skipPartiallyExpanded = state.availableSounds.size > 10
-    )
+    val modalBottomSheetState =
+      rememberModalBottomSheetState(
+        skipPartiallyExpanded = state.availableSounds.size > 10,
+      )
     val lazyListState = rememberLazyListState()
 
     LaunchedEffect(state.currentSound) {
@@ -46,19 +46,19 @@ class SoundPickerOverlay(
       sheetState = modalBottomSheetState,
       onDismissRequest = { navigator.finish(Dismiss) },
     ) {
-
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = lazyListState,
       ) {
         items(state.availableSounds) { sound ->
           Row(
-            modifier = Modifier
-              .defaultMinSize(minHeight = 48.dp)
-              .fillMaxWidth()
-              .padding(horizontal = 16.dp)
-              .clickable { navigator.finish(OverlayResult.SelectSound(state.field, sound)) },
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+              Modifier
+                .defaultMinSize(minHeight = 48.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .clickable { navigator.finish(OverlayResult.SelectSound(state.field, sound)) },
+            verticalAlignment = Alignment.CenterVertically,
           ) {
             RadioButton(
               selected = state.currentSound == sound,
@@ -73,7 +73,5 @@ class SoundPickerOverlay(
         }
       }
     }
-
   }
-
 }

@@ -27,14 +27,15 @@ import javax.inject.Inject
 
 private const val NOTIFICATION_CHANNEL_ID = "com.evanisnor.flowmeter"
 private const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
-private val VIBRATION_PATTERN = arrayOf(
-  0L,
-  1000L,
-  200L,
-  1000L,
-  200L,
-  1000L,
-).toLongArray()
+private val VIBRATION_PATTERN =
+  arrayOf(
+    0L,
+    1000L,
+    200L,
+    1000L,
+    200L,
+    1000L,
+  ).toLongArray()
 
 /**
  * Manage system notification integration
@@ -46,8 +47,11 @@ interface NotificationSystem {
   )
 
   suspend fun createNotificationChannel(settings: NotificationChannelSettings? = null)
+
   fun isNotificationPermissionGranted(): Boolean
+
   fun registerForPermissionResult(activity: ComponentActivity)
+
   fun requestPermission()
 }
 
@@ -62,93 +66,95 @@ interface NotificationPublisher {
   )
 
   suspend fun post(notification: Notification)
+
   fun cancel(notificationId: Int)
 }
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, NotificationSystem::class)
 @ContributesBinding(AppScope::class, NotificationPublisher::class)
-class NotificationSystemInterface @Inject constructor(
-  private val context: Context,
-  private val notificationManager: NotificationManagerCompat,
-  private val audioAttributes: AudioAttributes,
-  private val resources: Resources,
-  private val intentProvider: IntentProvider,
-) : NotificationSystem, NotificationPublisher {
+class NotificationSystemInterface
+  @Inject
+  constructor(
+    private val context: Context,
+    private val notificationManager: NotificationManagerCompat,
+    private val audioAttributes: AudioAttributes,
+    private val resources: Resources,
+    private val intentProvider: IntentProvider,
+  ) : NotificationSystem, NotificationPublisher {
+    private var permissionRequestLauncher: ActivityResultLauncher<String>? = null
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "notifications")
+    private val notificationChannelIdKey = stringPreferencesKey("notification_channel_id")
 
-  private var permissionRequestLauncher: ActivityResultLauncher<String>? = null
-  private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "notifications")
-  private val notificationChannelIdKey = stringPreferencesKey("notification_channel_id")
-
-  override fun isNotificationPermissionGranted(): Boolean {
-    val result = PermissionChecker.checkSelfPermission(context, POST_NOTIFICATIONS)
-    return result == PackageManager.PERMISSION_GRANTED
-  }
-
-  override fun registerForPermissionResult(activity: ComponentActivity) {
-    permissionRequestLauncher =
-      activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
-      }
-  }
-
-  override fun requestPermission() {
-    permissionRequestLauncher?.launch(POST_NOTIFICATIONS)
-  }
-
-  override suspend fun createNotificationChannel(settings: NotificationSystem.NotificationChannelSettings?) {
-    val existingChannelId = notificationChannelId()
-    if (existingChannelId != null && settings == null) {
-      return
+    override fun isNotificationPermissionGranted(): Boolean {
+      val result = PermissionChecker.checkSelfPermission(context, POST_NOTIFICATIONS)
+      return result == PackageManager.PERMISSION_GRANTED
     }
 
-    // Delete the previous Notification Channel so we can re-create it with the chosen sound.
-    existingChannelId?.let { notificationManager.deleteNotificationChannel(it) }
-    val newChannelId = NOTIFICATION_CHANNEL_ID + "|${System.currentTimeMillis()}"
-    saveNotificationChannelId(newChannelId)
-
-    NotificationChannelCompat.Builder(
-      newChannelId,
-      NotificationManagerCompat.IMPORTANCE_HIGH,
-    )
-      .setName(resources.getString(R.string.notification_channel_session))
-      .setDescription(resources.getString(R.string.notification_channel_session_description))
-      .setVibrationPattern(VIBRATION_PATTERN)
-      .setVibrationEnabled(settings?.vibrate ?: true)
-      .setSound(settings?.sound?.uri, audioAttributes)
-      .build().let {
-        notificationManager.createNotificationChannel(it)
-      }
-  }
-
-  @SuppressLint("MissingPermission")
-  override suspend fun post(notification: NotificationPublisher.Notification) {
-    val channelId = notificationChannelId()
-    if (isNotificationPermissionGranted() && channelId != null) {
-      NotificationCompat.Builder(context, channelId)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
-        .setContentTitle(notification.title)
-        .setPriority(NotificationCompat.PRIORITY_HIGH)
-        .setContentIntent(intentProvider.openApp)
-        .setAutoCancel(true)
-        .setSound(notification.sound?.uri)
-        .build().run {
-          notificationManager.notify(notification.id, this)
+    override fun registerForPermissionResult(activity: ComponentActivity) {
+      permissionRequestLauncher =
+        activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
         }
     }
-  }
 
-  override fun cancel(notificationId: Int) {
-    notificationManager.cancel(notificationId)
-  }
+    override fun requestPermission() {
+      permissionRequestLauncher?.launch(POST_NOTIFICATIONS)
+    }
 
-  private suspend fun notificationChannelId() = context.dataStore.data.map { preferences ->
-    preferences[notificationChannelIdKey]
-  }.first()
+    override suspend fun createNotificationChannel(settings: NotificationSystem.NotificationChannelSettings?) {
+      val existingChannelId = notificationChannelId()
+      if (existingChannelId != null && settings == null) {
+        return
+      }
 
-  private suspend fun saveNotificationChannelId(id: String) {
-    context.dataStore.edit { preferences ->
-      preferences[notificationChannelIdKey] = id
+      // Delete the previous Notification Channel so we can re-create it with the chosen sound.
+      existingChannelId?.let { notificationManager.deleteNotificationChannel(it) }
+      val newChannelId = NOTIFICATION_CHANNEL_ID + "|${System.currentTimeMillis()}"
+      saveNotificationChannelId(newChannelId)
+
+      NotificationChannelCompat.Builder(
+        newChannelId,
+        NotificationManagerCompat.IMPORTANCE_HIGH,
+      )
+        .setName(resources.getString(R.string.notification_channel_session))
+        .setDescription(resources.getString(R.string.notification_channel_session_description))
+        .setVibrationPattern(VIBRATION_PATTERN)
+        .setVibrationEnabled(settings?.vibrate ?: true)
+        .setSound(settings?.sound?.uri, audioAttributes)
+        .build().let {
+          notificationManager.createNotificationChannel(it)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    override suspend fun post(notification: NotificationPublisher.Notification) {
+      val channelId = notificationChannelId()
+      if (isNotificationPermissionGranted() && channelId != null) {
+        NotificationCompat.Builder(context, channelId)
+          .setSmallIcon(R.drawable.ic_launcher_foreground)
+          .setContentTitle(notification.title)
+          .setPriority(NotificationCompat.PRIORITY_HIGH)
+          .setContentIntent(intentProvider.openApp)
+          .setAutoCancel(true)
+          .setSound(notification.sound?.uri)
+          .build().run {
+            notificationManager.notify(notification.id, this)
+          }
+      }
+    }
+
+    override fun cancel(notificationId: Int) {
+      notificationManager.cancel(notificationId)
+    }
+
+    private suspend fun notificationChannelId() =
+      context.dataStore.data.map { preferences ->
+        preferences[notificationChannelIdKey]
+      }.first()
+
+    private suspend fun saveNotificationChannelId(id: String) {
+      context.dataStore.edit { preferences ->
+        preferences[notificationChannelIdKey] = id
+      }
     }
   }
-
-}

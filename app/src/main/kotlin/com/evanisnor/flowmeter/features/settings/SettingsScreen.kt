@@ -1,6 +1,5 @@
 package com.evanisnor.flowmeter.features.settings
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import com.evanisnor.flowmeter.system.RingtoneSystem
@@ -14,7 +13,6 @@ typealias FieldId = String
 
 @Parcelize
 data object SettingsScreen : Screen {
-
   data class State(
     val settingsItems: ImmutableList<SettingsListViewData>,
     val overlayState: SettingsOverlay.State? = null,
@@ -23,7 +21,9 @@ data object SettingsScreen : Screen {
 
   sealed interface Event : CircuitUiEvent {
     data object NavigateBack : Event
+
     data class FieldSelected(val field: FieldId) : Event
+
     data class OverlayResult(val result: SettingsOverlay.OverlayResult) : Event
   }
 }
@@ -37,17 +37,18 @@ object SettingsOverlay {
       val availableSounds: List<RingtoneSystem.RingtoneSound>,
       val currentSound: RingtoneSystem.RingtoneSound,
     ) : State
+
     data class InformationState(override val field: FieldId, val content: AnnotatedString) : State
   }
 
   sealed interface OverlayResult {
     data class SelectSound(val field: FieldId, val sound: RingtoneSystem.RingtoneSound) : OverlayResult
+
     data object Dismiss : OverlayResult
   }
 }
 
 sealed interface SettingsListViewData {
-
   data class GroupHeading(
     val icon: ImageVector,
     val label: String,
@@ -66,6 +67,7 @@ sealed interface SettingsListViewData {
   ) : SettingsListViewData
 
   data class DisplayValue(val label: String, val value: String) : SettingsListViewData
+
   data class MoreInformation(
     val field: FieldId,
     val label: String,

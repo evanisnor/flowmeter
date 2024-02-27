@@ -38,15 +38,18 @@ import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionCompleteUi
 import com.evanisnor.flowmeter.features.flowtimesession.ui.SessionInProgressUi
 import com.evanisnor.flowmeter.features.flowtimesession.ui.StartNewUi
 import com.evanisnor.flowmeter.features.flowtimesession.ui.TakingABreakUi
-import com.evanisnor.flowmeter.features.home.HomeScreen.State
 import com.evanisnor.flowmeter.features.home.HomeScreen.Event.OpenSettings
+import com.evanisnor.flowmeter.features.home.HomeScreen.State
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import com.slack.circuit.codegen.annotations.CircuitInject
 
 @CircuitInject(HomeScreen::class, AppScope::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeUi(state: State, modifier: Modifier = Modifier) {
+fun HomeUi(
+  state: State,
+  modifier: Modifier = Modifier,
+) {
   FlowmeterTheme {
     Scaffold(
       topBar = {
@@ -57,17 +60,18 @@ fun HomeUi(state: State, modifier: Modifier = Modifier) {
               IconButton(onClick = { state.eventSink(OpenSettings) }) {
                 Icon(
                   imageVector = Icons.TwoTone.Settings,
-                  contentDescription = stringResource(R.string.screen_settings)
+                  contentDescription = stringResource(R.string.screen_settings),
                 )
               }
             }
-          }
+          },
         )
       },
     ) { innerPadding ->
-      val screenModifier = modifier
-        .padding(innerPadding)
-        .fillMaxSize()
+      val screenModifier =
+        modifier
+          .padding(innerPadding)
+          .fillMaxSize()
 
       AnimatedContent(
         targetState = state,
@@ -81,27 +85,31 @@ fun HomeUi(state: State, modifier: Modifier = Modifier) {
               1000
             }
           fadeIn(
-            animationSpec = tween(duration)
-          ) togetherWith fadeOut(
-            animationSpec = tween(duration)
-          )
+            animationSpec = tween(duration),
+          ) togetherWith
+            fadeOut(
+              animationSpec = tween(duration),
+            )
         },
-        label = "Home UI"
+        label = "Home UI",
       ) { targetState ->
         when (targetState.sessionContent) {
           is StartNew -> StartNewUi(state = targetState.sessionContent, modifier = screenModifier)
-          is SessionComplete -> SessionCompleteUi(
-            state = targetState.sessionContent,
-            modifier = screenModifier
-          )
-          is SessionInProgress -> SessionInProgressUi(
-            state = targetState.sessionContent,
-            modifier = screenModifier
-          )
-          is TakingABreak -> TakingABreakUi(
-            state = targetState.sessionContent,
-            modifier = screenModifier
-          )
+          is SessionComplete ->
+            SessionCompleteUi(
+              state = targetState.sessionContent,
+              modifier = screenModifier,
+            )
+          is SessionInProgress ->
+            SessionInProgressUi(
+              state = targetState.sessionContent,
+              modifier = screenModifier,
+            )
+          is TakingABreak ->
+            TakingABreakUi(
+              state = targetState.sessionContent,
+              modifier = screenModifier,
+            )
         }
       }
     }
@@ -114,14 +122,16 @@ private fun AppTitle(modifier: Modifier = Modifier) {
     Icon(
       modifier = modifier.padding(horizontal = 4.dp),
       imageVector = Icons.TwoTone.DateRange,
-      contentDescription = null
+      contentDescription = null,
     )
-    Text(buildAnnotatedString {
-      append("flow")
-      withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
-        append("meter")
-      }
-    })
+    Text(
+      buildAnnotatedString {
+        append("flow")
+        withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
+          append("meter")
+        }
+      },
+    )
   }
 }
 
@@ -130,10 +140,13 @@ private fun AppTitle(modifier: Modifier = Modifier) {
 private fun HomeUiPreview() {
   FlowmeterTheme {
     Surface {
-      HomeUi(state = State(
-        sessionContent = StartNew(eventSink = {}),
-        eventSink = {}
-      ))
+      HomeUi(
+        state =
+          State(
+            sessionContent = StartNew(eventSink = {}),
+            eventSink = {},
+          ),
+      )
     }
   }
 }

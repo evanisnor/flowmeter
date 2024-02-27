@@ -8,10 +8,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data object HomeScreen : Screen {
-
   data class State(
     val sessionContent: SessionContent,
-    val eventSink: (Event) -> Unit
+    val eventSink: (Event) -> Unit,
   ) : CircuitUiState
 
   interface Event : CircuitUiEvent {

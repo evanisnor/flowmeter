@@ -7,15 +7,19 @@ import com.slack.circuit.overlay.ContentWithOverlays
 import com.slack.circuit.overlay.OverlayEffect
 
 @Composable
-fun SettingsOverlayUi(state: State?, onResult: (OverlayResult) -> Unit) {
+fun SettingsOverlayUi(
+  state: State?,
+  onResult: (OverlayResult) -> Unit,
+) {
   check(state != null) { return }
 
   ContentWithOverlays {
     OverlayEffect { host ->
-      val overlay = when (state) {
-        is State.InformationState -> InformationOverlay(state)
-        is State.SoundPickerState -> SoundPickerOverlay(state)
-      }
+      val overlay =
+        when (state) {
+          is State.InformationState -> InformationOverlay(state)
+          is State.SoundPickerState -> SoundPickerOverlay(state)
+        }
       val result = host.show(overlay)
       onResult(result)
     }

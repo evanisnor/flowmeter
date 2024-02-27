@@ -3,7 +3,6 @@ package com.evanisnor.flowmeter.features.flowtimesession
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import com.evanisnor.flowmeter.FeatureFlags
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionComplete
@@ -28,66 +27,75 @@ import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SessionContentPresenter @Inject constructor(
-  private val flowTimeSessionUseCase: FlowTimeSessionUseCase,
-  private val workManagerSystem: WorkManagerSystem,
-  @MainScope private val scope: CoroutineScope
-) : Presenter<SessionContent> {
-
-  @OptIn(ExperimentalCoroutinesApi::class)
-  @Composable
-  override fun present(): SessionContent {
-    val session = rememberRetained {
-      mutableStateOf<FlowTimeSessionUseCase>(NoOpFlowTimeSessionUseCase)
-    }
-
-    val reset : suspend () -> FlowTimeSessionUseCase = {
-      if (FeatureFlags.REUSE_WORK) {
-        workManagerSystem.startFlowTimeSession()
-      } else {
-        flowTimeSessionUseCase
-      }
-    }
-
-    val eventSink: (SessionEvent) -> Unit = { event ->
-      when (event) {
-        is NewSession -> scope.launch {
-          session.value = reset()
-          session.value.beginFlowSession()
+class SessionContentPresenter
+  @Inject
+  constructor(
+    private val flowTimeSessionUseCase: FlowTimeSessionUseCase,
+    private val workManagerSystem: WorkManagerSystem,
+    @MainScope private val scope: CoroutineScope,
+  ) : Presenter<SessionContent> {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Composable
+    override fun present(): SessionContent {
+      val session =
+        rememberRetained {
+          mutableStateOf<FlowTimeSessionUseCase>(NoOpFlowTimeSessionUseCase)
         }
-        is EndSession -> session.value.stop()
-        is TakeABreak -> scope.launch {
-          session.value = reset()
-          session.value.beginTakeABreak()
-        }
-        is EndBreak -> session.value.stop()
-      }
-    }
 
-    val sessionContent by produceRetainedState<SessionContent>(initialValue = StartNew(eventSink), key1 = session.value) {
-      snapshotFlow { session.value }.flattenConcat().collect { flowState ->
-        value = when (flowState) {
-          is FlowTimeSessionUseCase.FlowState.InTheFlow -> SessionInProgress(
-            duration = flowState.duration,
-            eventSink = eventSink
-          )
-          is FlowTimeSessionUseCase.FlowState.FlowComplete -> SessionComplete(
-            duration = flowState.duration,
-            breakRecommendation = flowState.recommendedBreak,
-            eventSink = eventSink,
-          )
-          is FlowTimeSessionUseCase.FlowState.TakingABreak -> SessionContent.TakingABreak(
-            duration = flowState.duration,
-            breakRecommendation = flowState.breakRecommendation,
-            isBreakLongerThanRecommended = flowState.isBreakLongerThanRecommended,
-            eventSink = eventSink,
-          )
-          FlowTimeSessionUseCase.FlowState.Idle,
-          FlowTimeSessionUseCase.FlowState.BreakIsOver -> StartNew(eventSink)
+      val reset: suspend () -> FlowTimeSessionUseCase = {
+        if (FeatureFlags.REUSE_WORK) {
+          workManagerSystem.startFlowTimeSession()
+        } else {
+          flowTimeSessionUseCase
         }
       }
-    }
 
-    return sessionContent
+      val eventSink: (SessionEvent) -> Unit = { event ->
+        when (event) {
+          is NewSession ->
+            scope.launch {
+              session.value = reset()
+              session.value.beginFlowSession()
+            }
+          is EndSession -> session.value.stop()
+          is TakeABreak ->
+            scope.launch {
+              session.value = reset()
+              session.value.beginTakeABreak()
+            }
+          is EndBreak -> session.value.stop()
+        }
+      }
+
+      val sessionContent by produceRetainedState<SessionContent>(initialValue = StartNew(eventSink), key1 = session.value) {
+        snapshotFlow { session.value }.flattenConcat().collect { flowState ->
+          value =
+            when (flowState) {
+              is FlowTimeSessionUseCase.FlowState.InTheFlow ->
+                SessionInProgress(
+                  duration = flowState.duration,
+                  eventSink = eventSink,
+                )
+              is FlowTimeSessionUseCase.FlowState.FlowComplete ->
+                SessionComplete(
+                  duration = flowState.duration,
+                  breakRecommendation = flowState.recommendedBreak,
+                  eventSink = eventSink,
+                )
+              is FlowTimeSessionUseCase.FlowState.TakingABreak ->
+                SessionContent.TakingABreak(
+                  duration = flowState.duration,
+                  breakRecommendation = flowState.breakRecommendation,
+                  isBreakLongerThanRecommended = flowState.isBreakLongerThanRecommended,
+                  eventSink = eventSink,
+                )
+              FlowTimeSessionUseCase.FlowState.Idle,
+              FlowTimeSessionUseCase.FlowState.BreakIsOver,
+              -> StartNew(eventSink)
+            }
+        }
+      }
+
+      return sessionContent
+    }
   }
-}

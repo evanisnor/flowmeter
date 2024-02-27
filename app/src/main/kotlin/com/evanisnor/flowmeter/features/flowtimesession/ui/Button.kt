@@ -25,9 +25,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import kotlin.time.Duration
 
-
 @Composable
-fun NewSessionButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun NewSessionButton(
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   Button(
     modifier = modifier,
     text = AnnotatedString("Start a new session"),
@@ -39,7 +41,10 @@ fun NewSessionButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StopButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun StopButton(
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   Button(
     modifier = modifier,
     text = AnnotatedString("Stop"),
@@ -51,16 +56,21 @@ fun StopButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TakeABreakButton(duration: Duration, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun TakeABreakButton(
+  duration: Duration,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   Button(
     modifier = modifier,
-    text = buildAnnotatedString {
-      append("Take a ")
-      withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-        append(duration.inWholeMinutes.toString())
-      }
-      append(" minute break")
-    },
+    text =
+      buildAnnotatedString {
+        append("Take a ")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+          append(duration.inWholeMinutes.toString())
+        }
+        append(" minute break")
+      },
     icon = Icons.Filled.Favorite,
     backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
     textColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -78,16 +88,17 @@ private fun Button(
   modifier: Modifier = Modifier,
 ) {
   TextButton(
-    modifier = modifier
-      .clip(RoundedCornerShape(8.dp))
-      .background(backgroundColor),
+    modifier =
+      modifier
+        .clip(RoundedCornerShape(8.dp))
+        .background(backgroundColor),
     onClick = onClick,
   ) {
     Icon(
       imageVector = icon,
       tint = textColor,
       contentDescription = null,
-      modifier = Modifier.padding(end = 8.dp)
+      modifier = Modifier.padding(end = 8.dp),
     )
     Text(
       text = text,

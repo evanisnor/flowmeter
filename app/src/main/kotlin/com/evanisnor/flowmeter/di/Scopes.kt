@@ -13,5 +13,6 @@ abstract class AppScope private constructor()
  */
 @Scope
 @Retention(AnnotationRetention.RUNTIME)
-annotation class SingleIn(@Suppress("unused") val scope: KClass<*>)
-
+annotation class SingleIn(
+  @Suppress("unused") val scope: KClass<*>,
+)

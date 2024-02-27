@@ -19,20 +19,22 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEv
 import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionInProgress
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 
-
 @Composable
-fun SessionInProgressUi(state: SessionInProgress, modifier: Modifier = Modifier) {
+fun SessionInProgressUi(
+  state: SessionInProgress,
+  modifier: Modifier = Modifier,
+) {
   Box(
     modifier = modifier,
-    contentAlignment = Alignment.Center
+    contentAlignment = Alignment.Center,
   ) {
     Column(
       verticalArrangement = Arrangement.spacedBy(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
+      horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Text(
         text = state.duration,
-        style = MaterialTheme.typography.displayLarge
+        style = MaterialTheme.typography.displayLarge,
       )
       StopButton(
         onClick = { state.eventSink(EndSession) },
@@ -49,13 +51,15 @@ private fun SessionInProgressPreview() {
     Surface {
       Scaffold { padding ->
         SessionInProgressUi(
-          modifier = Modifier
-            .padding(padding)
-            .fillMaxSize(),
-          state = SessionInProgress(
-            duration = "1:10:13",
-            eventSink = {},
-          )
+          modifier =
+            Modifier
+              .padding(padding)
+              .fillMaxSize(),
+          state =
+            SessionInProgress(
+              duration = "1:10:13",
+              eventSink = {},
+            ),
         )
       }
     }

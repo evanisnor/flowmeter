@@ -13,28 +13,29 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
-class HomePresenter @AssistedInject constructor(
-  @Assisted private val navigator: Navigator,
-  private val contentPresenter: SessionContentPresenter
-) : Presenter<State> {
-
-  @Composable
-  override fun present(): State {
-    val eventSink: (Event) -> Unit = { event ->
-      when (event) {
-        is Event.OpenSettings -> navigator.goTo(SettingsScreen)
+class HomePresenter
+  @AssistedInject
+  constructor(
+    @Assisted private val navigator: Navigator,
+    private val contentPresenter: SessionContentPresenter,
+  ) : Presenter<State> {
+    @Composable
+    override fun present(): State {
+      val eventSink: (Event) -> Unit = { event ->
+        when (event) {
+          is Event.OpenSettings -> navigator.goTo(SettingsScreen)
+        }
       }
+
+      return State(
+        sessionContent = contentPresenter.present(),
+        eventSink = eventSink,
+      )
     }
 
-    return State(
-      sessionContent = contentPresenter.present(),
-      eventSink = eventSink
-    )
+    @CircuitInject(HomeScreen::class, AppScope::class)
+    @AssistedFactory
+    fun interface Factory {
+      fun create(navigator: Navigator): HomePresenter
+    }
   }
-
-  @CircuitInject(HomeScreen::class, AppScope::class)
-  @AssistedFactory
-  fun interface Factory {
-    fun create(navigator: Navigator): HomePresenter
-  }
-}

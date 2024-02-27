@@ -27,41 +27,44 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionEv
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import kotlin.time.Duration.Companion.minutes
 
-
 @Composable
-fun SessionCompleteUi(state: SessionComplete, modifier: Modifier = Modifier) {
+fun SessionCompleteUi(
+  state: SessionComplete,
+  modifier: Modifier = Modifier,
+) {
   Box(
     modifier = modifier,
-    contentAlignment = Alignment.Center
+    contentAlignment = Alignment.Center,
   ) {
     Column(
       verticalArrangement = Arrangement.spacedBy(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
+      horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Text(
         modifier = Modifier.width(300.dp),
         textAlign = TextAlign.Center,
         text = "You were in the zone for",
-        style = MaterialTheme.typography.bodyMedium
+        style = MaterialTheme.typography.bodyMedium,
       )
       Text(
         modifier = Modifier.width(300.dp),
         textAlign = TextAlign.Center,
-        text = buildAnnotatedString {
-          withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-            append(state.duration)
-          }
-        },
-        style = MaterialTheme.typography.headlineMedium
+        text =
+          buildAnnotatedString {
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+              append(state.duration)
+            }
+          },
+        style = MaterialTheme.typography.headlineMedium,
       )
 
       TakeABreakButton(
         duration = state.breakRecommendation,
-        onClick = { state.eventSink(TakeABreak(state.breakRecommendation)) })
+        onClick = { state.eventSink(TakeABreak(state.breakRecommendation)) },
+      )
       NewSessionButton(
         onClick = { state.eventSink(NewSession) },
       )
-
     }
   }
 }
@@ -74,14 +77,16 @@ private fun SessionCompletePreview() {
     Surface {
       Scaffold { padding ->
         SessionCompleteUi(
-          modifier = Modifier
-            .padding(padding)
-            .fillMaxSize(),
-          state = SessionComplete(
-            duration = "1 hour and 24 minutes",
-            breakRecommendation = 10.minutes,
-            eventSink = {},
-          )
+          modifier =
+            Modifier
+              .padding(padding)
+              .fillMaxSize(),
+          state =
+            SessionComplete(
+              duration = "1 hour and 24 minutes",
+              breakRecommendation = 10.minutes,
+              eventSink = {},
+            ),
         )
       }
     }

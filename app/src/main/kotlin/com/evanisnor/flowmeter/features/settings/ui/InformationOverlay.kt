@@ -17,15 +17,14 @@ import com.slack.circuit.overlay.Overlay
 import com.slack.circuit.overlay.OverlayNavigator
 
 class InformationOverlay(
-  private val state : SettingsOverlay.State.InformationState,
+  private val state: SettingsOverlay.State.InformationState,
 ) : Overlay<OverlayResult> {
-
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
   override fun Content(navigator: OverlayNavigator<OverlayResult>) {
     ModalBottomSheet(onDismissRequest = { navigator.finish(Dismiss) }) {
       Column(
-        modifier = Modifier.verticalScroll(rememberScrollState())
+        modifier = Modifier.verticalScroll(rememberScrollState()),
       ) {
         Text(
           modifier = Modifier.padding(16.dp),
@@ -34,5 +33,4 @@ class InformationOverlay(
       }
     }
   }
-
 }

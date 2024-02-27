@@ -9,12 +9,10 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
-
 /**
  * App entry-point class.
  */
 class FlowmeterApp : Application() {
-
   private val appComponent: FlowmeterAppComponent =
     DaggerFlowmeterAppComponent.builder().context(this).build()
 
@@ -27,7 +25,7 @@ class FlowmeterApp : Application() {
 
     WorkManager.initialize(
       this@FlowmeterApp,
-      Configuration.Builder().setWorkerFactory(appComponent.workerFactoryFactory()).build()
+      Configuration.Builder().setWorkerFactory(appComponent.workerFactoryFactory()).build(),
     )
     WorkManager.getInstance(this).cancelAllWork()
 

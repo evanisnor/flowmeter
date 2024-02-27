@@ -5,11 +5,11 @@ import com.slack.circuit.runtime.CircuitUiState
 import kotlin.time.Duration
 
 sealed interface SessionContent : CircuitUiState {
-  val eventSink : (SessionEvent) -> Unit
+  val eventSink: (SessionEvent) -> Unit
 
   data class StartNew(
     override val eventSink: (SessionEvent) -> Unit,
-  ): SessionContent
+  ) : SessionContent
 
   data class SessionInProgress(
     val duration: String,
@@ -29,11 +29,13 @@ sealed interface SessionContent : CircuitUiState {
     override val eventSink: (SessionEvent) -> Unit,
   ) : SessionContent
 
-
   interface SessionEvent : CircuitUiEvent {
     data object NewSession : SessionEvent
+
     data object EndSession : SessionEvent
+
     data class TakeABreak(val duration: Duration) : SessionEvent
+
     data object EndBreak : SessionEvent
   }
 }

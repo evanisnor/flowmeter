@@ -11,15 +11,14 @@ import dagger.Provides
 @Module
 @ContributesTo(AppScope::class)
 class CircuitModule {
-
   @JvmSuppressWildcards
   @Provides
   fun circuit(
     presenterFactories: Set<Presenter.Factory>,
     uiFactories: Set<Ui.Factory>,
-  ): Circuit = Circuit.Builder()
+  ): Circuit =
+    Circuit.Builder()
       .addPresenterFactories(presenterFactories)
       .addUiFactories(uiFactories)
       .build()
-
 }

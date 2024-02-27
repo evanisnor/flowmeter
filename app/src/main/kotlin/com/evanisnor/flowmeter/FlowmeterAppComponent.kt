@@ -18,13 +18,16 @@ import dagger.Component
 @MergeComponent(AppScope::class)
 interface FlowmeterAppComponent {
   fun activityInjectors(): Map<Class<out ComponentActivity>, AnvilInjector<*>>
+
   fun workerFactoryFactory(): WorkerFactoryFactory
+
   fun notificationSystem(): NotificationSystem
 
   @Component.Builder
   interface Builder {
     @BindsInstance
     fun context(context: Context): Builder
+
     fun build(): FlowmeterAppComponent
   }
 }
