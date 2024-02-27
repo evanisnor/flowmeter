@@ -6,7 +6,6 @@ import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionUs
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MainScope
 import com.evanisnor.flowmeter.system.NotificationSystem
-import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -70,7 +69,6 @@ class RealFlowTimeSessionUseCase
     private val flowTimeSessionProvider: Provider<FlowTimeSession>,
     private val attentionGrabber: AttentionGrabber,
     private val notificationSystem: NotificationSystem,
-    private val workManagerSystem: WorkManagerSystem,
     private val settingsRepository: SettingsRepository,
     private val timeFormatter: TimeFormatter,
     @MainScope private val scope: CoroutineScope,
