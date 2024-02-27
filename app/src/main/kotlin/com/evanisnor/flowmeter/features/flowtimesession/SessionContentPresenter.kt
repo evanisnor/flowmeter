@@ -1,7 +1,6 @@
 package com.evanisnor.flowmeter.features.flowtimesession
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,10 +17,12 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionUseCase
 import com.evanisnor.flowmeter.features.flowtimesession.domain.NoOpFlowTimeSessionUseCase
 import com.evanisnor.flowmeter.features.flowtimesession.domain.startFlowTimeSession
+import com.evanisnor.flowmeter.system.MainScope
 import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.slack.circuit.retained.produceRetainedState
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.launch
@@ -30,12 +31,12 @@ import javax.inject.Inject
 class SessionContentPresenter @Inject constructor(
   private val flowTimeSessionUseCase: FlowTimeSessionUseCase,
   private val workManagerSystem: WorkManagerSystem,
+  @MainScope private val scope: CoroutineScope
 ) : Presenter<SessionContent> {
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Composable
   override fun present(): SessionContent {
-    val scope = rememberCoroutineScope()
     val session = rememberRetained {
       mutableStateOf<FlowTimeSessionUseCase>(NoOpFlowTimeSessionUseCase)
     }
@@ -50,11 +51,9 @@ class SessionContentPresenter @Inject constructor(
 
     val eventSink: (SessionEvent) -> Unit = { event ->
       when (event) {
-        is NewSession -> {
-          scope.launch {
-            session.value = reset()
-            session.value.beginFlowSession()
-          }
+        is NewSession -> scope.launch {
+          session.value = reset()
+          session.value.beginFlowSession()
         }
         is EndSession -> session.value.stop()
         is TakeABreak -> scope.launch {

@@ -12,10 +12,22 @@ import com.evanisnor.flowmeter.di.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import javax.inject.Qualifier
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class MainScope
 
 @Module
 @ContributesTo(AppScope::class)
 object SystemModule {
+
+  @Provides
+  @MainScope
+  fun mainScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
   @Provides
   fun resources(context: Context): Resources = context.resources
