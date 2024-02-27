@@ -117,9 +117,6 @@ tasks.register<Copy>("copySupplementalText") {
 afterEvaluate {
   tasks {
     getByName("preBuild").dependsOn("copySupplementalText")
-    check {
-      dependsOn("installKotlinterPrePushHook")
-    }
   }
 }
 
