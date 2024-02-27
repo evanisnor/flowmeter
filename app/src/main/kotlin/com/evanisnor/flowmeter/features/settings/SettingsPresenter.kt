@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import com.evanisnor.flowmeter.BuildConfig
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
@@ -46,7 +45,6 @@ private const val SETTING_SESSION_START_SOUND = "session_start_sound"
 private const val SETTING_BREAK_IS_OVER_SOUND = "break_is_over_sound"
 private const val SETTING_BREAK_IS_OVER_VIBRATE = "break_is_over_vibrate"
 private const val INFO_PRIVACY_POLICY = "privacy_policy"
-private const val INFO_OPEN_SOURCE_ATTRIBUTION = "open_source_attribution"
 private const val DEBUG_ENABLE_QUICK_BREAKS = "debug_enable_quick_breaks"
 
 class SettingsPresenter
@@ -142,9 +140,6 @@ class SettingsPresenter
               INFO_PRIVACY_POLICY ->
                 overlay.value =
                   InformationState(event.field, markdownReader.read(R.raw.privacy))
-              INFO_OPEN_SOURCE_ATTRIBUTION ->
-                overlay.value =
-                  InformationState(event.field, AnnotatedString(""))
               DEBUG_ENABLE_QUICK_BREAKS -> {
                 debugEnableQuickBreaks.value = !debugEnableQuickBreaks.value
                 scope.launch {
@@ -212,10 +207,6 @@ class SettingsPresenter
             MoreInformation(
               field = INFO_PRIVACY_POLICY,
               label = stringResource(R.string.settings_information_privacy_policy),
-            ),
-            MoreInformation(
-              field = INFO_OPEN_SOURCE_ATTRIBUTION,
-              label = stringResource(R.string.settings_information_open_source_attribution),
             ),
           ).apply {
             if (BuildConfig.DEBUG) {
