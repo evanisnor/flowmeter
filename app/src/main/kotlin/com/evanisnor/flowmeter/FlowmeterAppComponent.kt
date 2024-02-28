@@ -6,7 +6,6 @@ import com.evanisnor.flowmeter.di.AnvilInjector
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.system.NotificationChannelSystem
-import com.evanisnor.flowmeter.system.NotificationSystem
 import com.evanisnor.flowmeter.system.WorkerFactoryFactory
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance

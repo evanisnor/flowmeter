@@ -5,28 +5,18 @@ import android.app.Notification
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.res.Resources
-import android.media.AudioAttributes
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
@@ -96,9 +86,9 @@ class NotificationSystemInterface
     override suspend fun post(notification: NotificationPublisher.Notification) {
       if (isNotificationPermissionGranted()) {
         notificationChannelSystem.breakIsOverChannelId()?.let { channelId ->
-        notification.translate(channelId).run {
-          notificationManager.notify(notification.id, this)
-        }
+          notification.translate(channelId).run {
+            notificationManager.notify(notification.id, this)
+          }
         }
       }
     }
@@ -108,14 +98,14 @@ class NotificationSystemInterface
       notification: NotificationPublisher.Notification,
     ) {
       if (isNotificationPermissionGranted()) {
-        notificationChannelSystem.flowSessionChannelId()?.let {channelId ->
-        worker.setForeground(
-          ForegroundInfo(
-            notification.id,
-            notification.translate(channelId),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
-          ),
-        )
+        notificationChannelSystem.flowSessionChannelId()?.let { channelId ->
+          worker.setForeground(
+            ForegroundInfo(
+              notification.id,
+              notification.translate(channelId),
+              ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+            ),
+          )
         }
       }
     }

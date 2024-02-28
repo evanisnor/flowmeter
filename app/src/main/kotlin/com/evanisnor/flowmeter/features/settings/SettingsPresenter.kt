@@ -30,7 +30,8 @@ import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MarkdownReader
 import com.evanisnor.flowmeter.system.MediaPlayerSystem
 import com.evanisnor.flowmeter.system.NotificationChannelSystem
-import com.evanisnor.flowmeter.system.NotificationSystem
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.BreakIsOverNotificationChannel
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannelSettings
 import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.retained.rememberRetained
@@ -41,8 +42,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
-import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannelSettings
-import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.BreakIsOverNotificationChannel
 
 private const val SETTING_SESSION_START_SOUND = "session_start_sound"
 private const val SETTING_BREAK_IS_OVER_SOUND = "break_is_over_sound"
@@ -104,7 +103,10 @@ class SettingsPresenter
                 breakIsOver.value = breakIsOver.value.copy(sound = result.sound)
                 scope.launch {
                   settingsRepository.saveBreakIsOverSound(result.sound)
-                  notificationChannelSystem.createNotificationChannel(BreakIsOverNotificationChannel, settings = breakIsOver.value)
+                  notificationChannelSystem.createNotificationChannel(
+                    BreakIsOverNotificationChannel,
+                    settings = breakIsOver.value,
+                  )
                 }
               }
             }
@@ -137,7 +139,10 @@ class SettingsPresenter
                 breakIsOver.value = breakIsOver.value.copy(vibrate = vibrate)
                 scope.launch {
                   settingsRepository.saveBreakIsOverVibrate(vibrate)
-                  notificationChannelSystem.createNotificationChannel(BreakIsOverNotificationChannel, settings = breakIsOver.value)
+                  notificationChannelSystem.createNotificationChannel(
+                    BreakIsOverNotificationChannel,
+                    settings = breakIsOver.value,
+                  )
                 }
               }
               INFO_PRIVACY_POLICY ->
