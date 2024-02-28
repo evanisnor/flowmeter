@@ -1,11 +1,13 @@
 package com.evanisnor.flowmeter.features.flowtimesession.domain
 
 import android.content.Context
+import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.WorkerFactory
 import com.evanisnor.flowmeter.di.WorkerKey
+import com.evanisnor.flowmeter.system.NotificationPublisher
 import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.evanisnor.flowmeter.system.WorkerRegistrar
 import com.squareup.anvil.annotations.ContributesTo
@@ -16,7 +18,10 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
+
+private const val FLOW_SESSION_FOREGROUND_NOTIFICATION_ID = 123156
 
 /**
  * Convenience function for launching [FlowTimeSessionUseCase]
@@ -36,6 +41,7 @@ class FlowTimeSessionWorker
     @Assisted workerParameters: WorkerParameters,
     private val flowTimeSessionUseCase: FlowTimeSessionUseCase,
     private val registrar: WorkerRegistrar,
+    private val notificationPublisher: NotificationPublisher,
   ) : CoroutineWorker(context, workerParameters), FlowTimeSessionUseCase {
     private val work: Mutex = Mutex(locked = true)
 
@@ -43,10 +49,19 @@ class FlowTimeSessionWorker
 
     override suspend fun beginTakeABreak() = flowTimeSessionUseCase.beginTakeABreak()
 
-    override suspend fun collect(collector: FlowCollector<FlowTimeSessionUseCase.FlowState>) =
-      flowTimeSessionUseCase.collect(
-        collector,
-      )
+    override suspend fun collect(collector: FlowCollector<FlowTimeSessionUseCase.FlowState>) {
+      flowTimeSessionUseCase.collectLatest { state ->
+        // Intercept flow state so we can update the Foreground Notification
+        when (state) {
+          is FlowTimeSessionUseCase.FlowState.InTheFlow ->
+            postForegroundNotification(
+              state.duration,
+            )
+          else -> { /* State ignored */ }
+        }
+        collector.emit(state)
+      }
+    }
 
     override fun stop() {
       flowTimeSessionUseCase.stop()
@@ -60,6 +75,22 @@ class FlowTimeSessionWorker
       registrar.register(this)
       work.lock()
       return Result.success()
+    }
+
+    private suspend fun postForegroundNotification(duration: String) {
+      if (!work.isLocked) {
+        return
+      }
+      notificationPublisher.post(
+        worker = this@FlowTimeSessionWorker,
+        notification =
+          NotificationPublisher.Notification(
+            id = FLOW_SESSION_FOREGROUND_NOTIFICATION_ID,
+            title = "In the zone. $duration",
+            priority = NotificationCompat.PRIORITY_DEFAULT,
+            ongoing = true,
+          ),
+      )
     }
 
     @AssistedFactory

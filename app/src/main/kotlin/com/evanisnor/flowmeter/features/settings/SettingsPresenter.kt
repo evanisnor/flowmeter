@@ -29,6 +29,7 @@ import com.evanisnor.flowmeter.features.settings.SettingsScreen.State
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MarkdownReader
 import com.evanisnor.flowmeter.system.MediaPlayerSystem
+import com.evanisnor.flowmeter.system.NotificationChannelSystem
 import com.evanisnor.flowmeter.system.NotificationSystem
 import com.evanisnor.flowmeter.system.RingtoneSystem
 import com.slack.circuit.codegen.annotations.CircuitInject
@@ -40,6 +41,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannelSettings
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.BreakIsOverNotificationChannel
 
 private const val SETTING_SESSION_START_SOUND = "session_start_sound"
 private const val SETTING_BREAK_IS_OVER_SOUND = "break_is_over_sound"
@@ -54,7 +57,7 @@ class SettingsPresenter
     private val ringtoneSystem: RingtoneSystem,
     private val settingsRepository: SettingsRepository,
     private val mediaPlayerSystem: MediaPlayerSystem,
-    private val notificationSystem: NotificationSystem,
+    private val notificationChannelSystem: NotificationChannelSystem,
     private val markdownReader: MarkdownReader,
   ) : Presenter<State> {
     @Composable
@@ -68,7 +71,7 @@ class SettingsPresenter
       val breakIsOver =
         rememberRetained {
           mutableStateOf(
-            NotificationSystem.NotificationChannelSettings(
+            NotificationChannelSettings(
               sound = ringtoneSystem.getDefaultSound(),
               vibrate = true,
             ),
@@ -80,7 +83,7 @@ class SettingsPresenter
         availableSounds.value = ringtoneSystem.getSounds()
         sessionStartSound.value = settingsRepository.getSessionStartSound()
         breakIsOver.value =
-          NotificationSystem.NotificationChannelSettings(
+          NotificationChannelSettings(
             sound = settingsRepository.getBreakIsOverSound(),
             vibrate = settingsRepository.getBreakIsOverVibrate(),
           )
@@ -101,7 +104,7 @@ class SettingsPresenter
                 breakIsOver.value = breakIsOver.value.copy(sound = result.sound)
                 scope.launch {
                   settingsRepository.saveBreakIsOverSound(result.sound)
-                  notificationSystem.createNotificationChannel(settings = breakIsOver.value)
+                  notificationChannelSystem.createNotificationChannel(BreakIsOverNotificationChannel, settings = breakIsOver.value)
                 }
               }
             }
@@ -134,7 +137,7 @@ class SettingsPresenter
                 breakIsOver.value = breakIsOver.value.copy(vibrate = vibrate)
                 scope.launch {
                   settingsRepository.saveBreakIsOverVibrate(vibrate)
-                  notificationSystem.createNotificationChannel(settings = breakIsOver.value)
+                  notificationChannelSystem.createNotificationChannel(BreakIsOverNotificationChannel, settings = breakIsOver.value)
                 }
               }
               INFO_PRIVACY_POLICY ->

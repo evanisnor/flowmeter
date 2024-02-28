@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
     // Notification Post Permission
     if (!notificationSystem.isNotificationPermissionGranted()) {
       notificationSystem.registerForPermissionResult(this)
+      notificationSystem.requestPermission()
     }
     ringtoneInitializer.initialize(this)
 

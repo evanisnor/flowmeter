@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.FlowSessionNotificationChannel
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.BreakIsOverNotificationChannel
 
 /**
  * App entry-point class.
@@ -30,7 +32,10 @@ class FlowmeterApp : Application() {
     WorkManager.getInstance(this).cancelAllWork()
 
     CoroutineScope(Dispatchers.Main).launch {
-      appComponent.notificationSystem().createNotificationChannel()
+      with(appComponent.notificationChannelSystem()) {
+        createNotificationChannel(FlowSessionNotificationChannel)
+        createNotificationChannel(BreakIsOverNotificationChannel)
+      }
     }
   }
 

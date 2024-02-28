@@ -1,5 +1,6 @@
 package com.evanisnor.flowmeter.features.flowtimesession.domain
 
+import androidx.core.app.NotificationCompat
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MediaPlayerSystem
 import com.evanisnor.flowmeter.system.NotificationPublisher
@@ -26,6 +27,7 @@ class AttentionGrabber
         NotificationPublisher.Notification(
           id = BREAK_IS_OVER_NOTIFICATION,
           title = "Break time is over!",
+          priority = NotificationCompat.PRIORITY_HIGH,
           sound = settingsRepository.getBreakIsOverSound(),
         ),
       )

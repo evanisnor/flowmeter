@@ -68,7 +68,6 @@ class RealFlowTimeSessionUseCase
   constructor(
     private val flowTimeSessionProvider: Provider<FlowTimeSession>,
     private val attentionGrabber: AttentionGrabber,
-    private val notificationSystem: NotificationSystem,
     private val settingsRepository: SettingsRepository,
     private val timeFormatter: TimeFormatter,
     @MainScope private val scope: CoroutineScope,
@@ -82,7 +81,6 @@ class RealFlowTimeSessionUseCase
 
     override suspend fun beginFlowSession() {
       Timber.i("Starting a new Flow session")
-      checkForNotificationPermission()
       currentSession.get().stop()
       isTakingABreak.set(false)
       attentionGrabber.clearBreakIsOverNotification()
@@ -156,12 +154,6 @@ class RealFlowTimeSessionUseCase
         FlowState.BreakIsOver -> {
           notifiedBreakIsOver.set(false)
         }
-      }
-    }
-
-    private fun checkForNotificationPermission() {
-      if (!notificationSystem.isNotificationPermissionGranted()) {
-        notificationSystem.requestPermission()
       }
     }
 
