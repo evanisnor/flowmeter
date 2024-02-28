@@ -7,6 +7,8 @@ import androidx.work.WorkerParameters
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.WorkerFactory
 import com.evanisnor.flowmeter.di.WorkerKey
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.FlowSessionNotificationChannel
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.TakingABreakNotificationChannel
 import com.evanisnor.flowmeter.system.NotificationPublisher
 import com.evanisnor.flowmeter.system.WorkManagerSystem
 import com.evanisnor.flowmeter.system.WorkerRegistrar
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 
 private const val FLOW_SESSION_FOREGROUND_NOTIFICATION_ID = 123156
+private const val BREAK_SESSION_FOREGROUND_NOTIFICATION_ID = 123157
 
 /**
  * Convenience function for launching [FlowTimeSessionUseCase]
@@ -54,7 +57,11 @@ class FlowTimeSessionWorker
         // Intercept flow state so we can update the Foreground Notification
         when (state) {
           is FlowTimeSessionUseCase.FlowState.InTheFlow ->
-            postForegroundNotification(
+            postFlowNotification(
+              state.duration,
+            )
+          is FlowTimeSessionUseCase.FlowState.TakingABreak ->
+            postBreakNotification(
               state.duration,
             )
           else -> { /* State ignored */ }
@@ -77,10 +84,11 @@ class FlowTimeSessionWorker
       return Result.success()
     }
 
-    private suspend fun postForegroundNotification(duration: String) {
+    private suspend fun postFlowNotification(duration: String) {
       if (!work.isLocked) {
         return
       }
+
       notificationPublisher.post(
         worker = this@FlowTimeSessionWorker,
         notification =
@@ -90,6 +98,25 @@ class FlowTimeSessionWorker
             priority = NotificationCompat.PRIORITY_DEFAULT,
             ongoing = true,
           ),
+        channel = FlowSessionNotificationChannel,
+      )
+    }
+
+    private suspend fun postBreakNotification(duration: String) {
+      if (!work.isLocked) {
+        return
+      }
+
+      notificationPublisher.post(
+        worker = this@FlowTimeSessionWorker,
+        notification =
+          NotificationPublisher.Notification(
+            id = BREAK_SESSION_FOREGROUND_NOTIFICATION_ID,
+            title = "Taking a break. $duration",
+            priority = NotificationCompat.PRIORITY_DEFAULT,
+            ongoing = true,
+          ),
+        channel = TakingABreakNotificationChannel,
       )
     }
 

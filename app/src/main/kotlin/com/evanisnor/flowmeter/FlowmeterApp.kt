@@ -5,6 +5,7 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.BreakIsOverNotificationChannel
 import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.FlowSessionNotificationChannel
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.TakingABreakNotificationChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ class FlowmeterApp : Application() {
     CoroutineScope(Dispatchers.Main).launch {
       with(appComponent.notificationChannelSystem()) {
         createNotificationChannel(FlowSessionNotificationChannel)
+        createNotificationChannel(TakingABreakNotificationChannel)
         createNotificationChannel(BreakIsOverNotificationChannel)
       }
     }

@@ -3,6 +3,7 @@ package com.evanisnor.flowmeter.features.flowtimesession.domain
 import androidx.core.app.NotificationCompat
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MediaPlayerSystem
+import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.BreakIsOverNotificationChannel
 import com.evanisnor.flowmeter.system.NotificationPublisher
 import javax.inject.Inject
 
@@ -24,12 +25,14 @@ class AttentionGrabber
 
     suspend fun notifyBreakIsOver() {
       notificationPublisher.post(
-        NotificationPublisher.Notification(
-          id = BREAK_IS_OVER_NOTIFICATION,
-          title = "Break time is over!",
-          priority = NotificationCompat.PRIORITY_HIGH,
-          sound = settingsRepository.getBreakIsOverSound(),
-        ),
+        notification =
+          NotificationPublisher.Notification(
+            id = BREAK_IS_OVER_NOTIFICATION,
+            title = "Break time is over!",
+            priority = NotificationCompat.PRIORITY_HIGH,
+            sound = settingsRepository.getBreakIsOverSound(),
+          ),
+        channel = BreakIsOverNotificationChannel,
       )
     }
 

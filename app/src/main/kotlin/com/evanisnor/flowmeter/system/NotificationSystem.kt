@@ -44,11 +44,15 @@ interface NotificationPublisher {
     val ongoing: Boolean = false,
   )
 
-  suspend fun post(notification: Notification)
+  suspend fun post(
+    notification: Notification,
+    channel: NotificationChannelSystem.NotificationChannel,
+  )
 
   suspend fun post(
     worker: CoroutineWorker,
     notification: Notification,
+    channel: NotificationChannelSystem.NotificationChannel,
   )
 
   fun cancel(notificationId: Int)
@@ -83,9 +87,12 @@ class NotificationSystemInterface
     }
 
     @SuppressLint("MissingPermission")
-    override suspend fun post(notification: NotificationPublisher.Notification) {
+    override suspend fun post(
+      notification: NotificationPublisher.Notification,
+      channel: NotificationChannelSystem.NotificationChannel,
+    ) {
       if (isNotificationPermissionGranted()) {
-        notificationChannelSystem.breakIsOverChannelId()?.let { channelId ->
+        notificationChannelSystem.notificationChannelId(channel)?.let { channelId ->
           notification.translate(channelId).run {
             notificationManager.notify(notification.id, this)
           }
@@ -96,9 +103,10 @@ class NotificationSystemInterface
     override suspend fun post(
       worker: CoroutineWorker,
       notification: NotificationPublisher.Notification,
+      channel: NotificationChannelSystem.NotificationChannel,
     ) {
       if (isNotificationPermissionGranted()) {
-        notificationChannelSystem.flowSessionChannelId()?.let { channelId ->
+        notificationChannelSystem.notificationChannelId(channel)?.let { channelId ->
           worker.setForeground(
             ForegroundInfo(
               notification.id,

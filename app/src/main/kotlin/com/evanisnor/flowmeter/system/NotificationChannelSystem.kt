@@ -13,8 +13,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
-import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.BreakIsOverNotificationChannel
-import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.FlowSessionNotificationChannel
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -37,17 +35,27 @@ private val VIBRATION_PATTERN =
 interface NotificationChannelSystem {
   sealed interface NotificationChannel {
     val name: String
+    val importance: Int
     val useDefaultSound: Boolean
     val defaultVibrate: Boolean
 
     data object FlowSessionNotificationChannel : NotificationChannel {
       override val name: String = "$NOTIFICATION_CHANNEL_PREFIX:channel:flow_session"
+      override val importance: Int = NotificationManagerCompat.IMPORTANCE_DEFAULT
+      override val useDefaultSound: Boolean = false
+      override val defaultVibrate: Boolean = false
+    }
+
+    data object TakingABreakNotificationChannel : NotificationChannel {
+      override val name: String = "$NOTIFICATION_CHANNEL_PREFIX:channel:taking_a_break"
+      override val importance: Int = NotificationManagerCompat.IMPORTANCE_DEFAULT
       override val useDefaultSound: Boolean = false
       override val defaultVibrate: Boolean = false
     }
 
     data object BreakIsOverNotificationChannel : NotificationChannel {
       override val name: String = "$NOTIFICATION_CHANNEL_PREFIX:channel:break_is_over"
+      override val importance: Int = NotificationManagerCompat.IMPORTANCE_HIGH
       override val useDefaultSound: Boolean = true
       override val defaultVibrate: Boolean = true
     }
@@ -58,9 +66,7 @@ interface NotificationChannelSystem {
     val vibrate: Boolean,
   )
 
-  suspend fun flowSessionChannelId(): String?
-
-  suspend fun breakIsOverChannelId(): String?
+  suspend fun notificationChannelId(channel: NotificationChannel): String?
 
   suspend fun createNotificationChannel(
     channel: NotificationChannel,
@@ -83,15 +89,11 @@ class NotificationChannelSystemInterface
       name = "notifications",
     )
 
-    override suspend fun flowSessionChannelId(): String? =
-      notificationChannelId(
-        FlowSessionNotificationChannel,
-      )
-
-    override suspend fun breakIsOverChannelId(): String? =
-      notificationChannelId(
-        BreakIsOverNotificationChannel,
-      )
+    override suspend fun notificationChannelId(
+      channel: NotificationChannelSystem.NotificationChannel,
+    ) = context.dataStore.data.map { preferences ->
+      preferences[stringPreferencesKey(channel.name)]
+    }.first()
 
     override suspend fun createNotificationChannel(
       channel: NotificationChannelSystem.NotificationChannel,
@@ -107,13 +109,15 @@ class NotificationChannelSystemInterface
       val newChannelId = channel.name + "|${System.currentTimeMillis()}"
       saveNotificationChannelId(channel, newChannelId)
 
-      val sound = settings?.sound?.uri ?: if (channel.useDefaultSound) ringtoneSystem.getDefaultSound().uri else null
+      val sound =
+        settings?.sound?.uri ?: if (channel.useDefaultSound) {
+          ringtoneSystem.getDefaultSound().uri
+        } else {
+          null
+        }
       val vibrate = settings?.vibrate ?: channel.defaultVibrate
 
-      NotificationChannelCompat.Builder(
-        newChannelId,
-        NotificationManagerCompat.IMPORTANCE_HIGH,
-      )
+      NotificationChannelCompat.Builder(newChannelId, channel.importance)
         .setName(resources.getString(R.string.notification_channel_session))
         .setDescription(resources.getString(R.string.notification_channel_session_description))
         .setSound(sound, audioAttributes)
@@ -127,12 +131,6 @@ class NotificationChannelSystemInterface
           notificationManager.createNotificationChannel(it)
         }
     }
-
-    private suspend fun notificationChannelId(
-      channel: NotificationChannelSystem.NotificationChannel,
-    ) = context.dataStore.data.map { preferences ->
-      preferences[stringPreferencesKey(channel.name)]
-    }.first()
 
     private suspend fun saveNotificationChannelId(
       channel: NotificationChannelSystem.NotificationChannel,
