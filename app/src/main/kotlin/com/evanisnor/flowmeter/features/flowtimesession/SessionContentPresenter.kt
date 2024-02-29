@@ -42,30 +42,24 @@ class SessionContentPresenter
         }
       val breakRecommendation = rememberRetained { mutableStateOf(0.seconds) }
 
-      val reset: suspend () -> FlowTimeSessionUseCase = {
-        workManagerSystem.startFlowTimeSession()
-      }
-
       val eventSink: (SessionEvent) -> Unit = { event ->
-        when (event) {
-          is NewSession ->
-            scope.launch {
-              session.value = reset()
+        scope.launch {
+          when (event) {
+            is NewSession -> {
+              session.value = newSession()
               session.value.beginFlowSession()
             }
-          is EndSession ->
-            scope.launch {
+            is EndSession -> {
               session.value.stop()
             }
-          is TakeABreak ->
-            scope.launch {
-              session.value = reset()
+            is TakeABreak -> {
+              session.value = newSession()
               session.value.beginTakeABreak(breakRecommendation.value)
             }
-          is EndBreak ->
-            scope.launch {
+            is EndBreak -> {
               session.value.stop()
             }
+          }
         }
       }
 
@@ -105,4 +99,7 @@ class SessionContentPresenter
 
       return sessionContent
     }
+
+    private suspend fun newSession(): FlowTimeSessionUseCase =
+      workManagerSystem.startFlowTimeSession()
   }
