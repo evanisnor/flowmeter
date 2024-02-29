@@ -86,7 +86,6 @@ class RealFlowTimeSessionUseCase
       flowTimeSessionProvider.get().let {
         currentSession.set(it)
         collectFromSession(it)
-        it.start()
       }
       attentionGrabber.notifySessionStarted()
     }
@@ -97,7 +96,6 @@ class RealFlowTimeSessionUseCase
       flowTimeSessionProvider.get().let {
         currentSession.set(it)
         collectFromSession(it)
-        it.start()
       }
     }
 
