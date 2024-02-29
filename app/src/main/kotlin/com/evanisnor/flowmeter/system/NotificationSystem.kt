@@ -109,7 +109,8 @@ constructor(
     if (isNotificationPermissionGranted() && !worker.isStopped) {
       notificationChannelSystem.notificationChannelId(channel)?.let { channelId ->
         Timber.v(
-          "Posting ${worker::class.simpleName}:${worker.id} foreground notification [$channel <= $notification",
+          "Posting ${worker::class.simpleName}:${worker.id} " +
+            "foreground notification [$channel <= $notification",
         )
         worker.setForeground(
           ForegroundInfo(
