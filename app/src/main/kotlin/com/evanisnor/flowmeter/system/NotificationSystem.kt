@@ -13,7 +13,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.await
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
@@ -109,7 +108,9 @@ class NotificationSystemInterface
     ) {
       if (isNotificationPermissionGranted() && !worker.isStopped) {
         notificationChannelSystem.notificationChannelId(channel)?.let { channelId ->
-          Timber.v("Posting ${worker::class.simpleName}:${worker.id} foreground notification [$channel <= $notification")
+          Timber.v(
+            "Posting ${worker::class.simpleName}:${worker.id} foreground notification [$channel <= $notification",
+          )
           worker.setForeground(
             ForegroundInfo(
               notification.id,

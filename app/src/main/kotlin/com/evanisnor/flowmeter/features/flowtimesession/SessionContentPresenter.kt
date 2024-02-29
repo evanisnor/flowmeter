@@ -25,11 +25,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 class SessionContentPresenter
   @Inject
   constructor(
-    private val flowTimeSessionUseCase: FlowTimeSessionUseCase,
     private val workManagerSystem: WorkManagerSystem,
     @MainScope private val scope: CoroutineScope,
   ) : Presenter<SessionContent> {
@@ -40,6 +40,7 @@ class SessionContentPresenter
         rememberRetained {
           mutableStateOf<FlowTimeSessionUseCase>(NoOpFlowTimeSessionUseCase)
         }
+      val breakRecommendation = rememberRetained { mutableStateOf(0.seconds) }
 
       val reset: suspend () -> FlowTimeSessionUseCase = {
         workManagerSystem.startFlowTimeSession()
@@ -52,13 +53,19 @@ class SessionContentPresenter
               session.value = reset()
               session.value.beginFlowSession()
             }
-          is EndSession -> session.value.stop()
+          is EndSession ->
+            scope.launch {
+              session.value.stop()
+            }
           is TakeABreak ->
             scope.launch {
               session.value = reset()
-              session.value.beginTakeABreak()
+              session.value.beginTakeABreak(breakRecommendation.value)
             }
-          is EndBreak -> session.value.stop()
+          is EndBreak ->
+            scope.launch {
+              session.value.stop()
+            }
         }
       }
 
@@ -79,7 +86,9 @@ class SessionContentPresenter
                   duration = flowState.duration,
                   breakRecommendation = flowState.recommendedBreak,
                   eventSink = eventSink,
-                )
+                ).also {
+                  breakRecommendation.value = flowState.recommendedBreak
+                }
               is FlowTimeSessionUseCase.FlowState.TakingABreak ->
                 SessionContent.TakingABreak(
                   duration = flowState.duration,
@@ -87,8 +96,8 @@ class SessionContentPresenter
                   isBreakLongerThanRecommended = flowState.isBreakLongerThanRecommended,
                   eventSink = eventSink,
                 )
-              FlowTimeSessionUseCase.FlowState.Idle,
-              FlowTimeSessionUseCase.FlowState.BreakIsOver,
+              is FlowTimeSessionUseCase.FlowState.Idle,
+              is FlowTimeSessionUseCase.FlowState.BreakIsOver,
               -> StartNew(eventSink)
             }
         }

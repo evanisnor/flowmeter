@@ -8,6 +8,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.sync.Mutex
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -28,14 +29,14 @@ interface FlowTimeSession : Flow<State> {
     ) : State
   }
 
-  fun stop()
+  suspend fun stop()
 }
 
 /**
  * [FlowTimeSession] that does not do anything. Used as an initial state.
  */
 object NoOpFlowTimeSession : FlowTimeSession {
-  override fun stop() = Unit
+  override suspend fun stop() = Unit
 
   override suspend fun collect(collector: FlowCollector<State>) = Unit
 }
@@ -51,9 +52,11 @@ class FlowTimeSessionLogic
     private val timeProvider: TimeProvider,
   ) : FlowTimeSession {
     private val isRunning: AtomicBoolean = AtomicBoolean(true)
+    private val stopping = Mutex(locked = true)
 
-    override fun stop() {
+    override suspend fun stop() {
       isRunning.set(false)
+      stopping.lock()
     }
 
     override suspend fun collect(collector: FlowCollector<State>) {
@@ -73,6 +76,7 @@ class FlowTimeSessionLogic
       ).run {
         collector.emit(this)
         Timber.i("Session complete")
+        stopping.unlock()
       }
     }
 

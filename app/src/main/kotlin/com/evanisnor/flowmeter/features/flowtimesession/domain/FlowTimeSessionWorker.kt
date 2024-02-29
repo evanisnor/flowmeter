@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 import timber.log.Timber
+import kotlin.time.Duration
 
 private const val FLOW_SESSION_FOREGROUND_NOTIFICATION_ID = 123156
 private const val BREAK_SESSION_FOREGROUND_NOTIFICATION_ID = 123157
@@ -32,11 +33,7 @@ private const val BREAK_SESSION_FOREGROUND_NOTIFICATION_ID = 123157
  * Convenience function for launching [FlowTimeSessionUseCase]
  */
 suspend fun WorkManagerSystem.startFlowTimeSession(): FlowTimeSessionUseCase {
-  return if (isRunning(FlowTimeSessionWorker::class)) {
-    locate(FlowTimeSessionWorker::class)
-  } else {
-    runOnce(FlowTimeSessionWorker::class)
-  }
+  return runOnce(FlowTimeSessionWorker::class)
 }
 
 class FlowTimeSessionWorker
@@ -52,7 +49,10 @@ class FlowTimeSessionWorker
 
     override suspend fun beginFlowSession() = flowTimeSessionUseCase.beginFlowSession()
 
-    override suspend fun beginTakeABreak() = flowTimeSessionUseCase.beginTakeABreak()
+    override suspend fun beginTakeABreak(breakRecommendation: Duration) =
+      flowTimeSessionUseCase.beginTakeABreak(
+        breakRecommendation,
+      )
 
     override suspend fun collect(collector: FlowCollector<FlowTimeSessionUseCase.FlowState>) {
       flowTimeSessionUseCase.collectLatest { state ->
@@ -72,12 +72,11 @@ class FlowTimeSessionWorker
       }
     }
 
-    override fun stop() {
+    override suspend fun stop() {
       flowTimeSessionUseCase.stop()
       if (work.isLocked) {
         work.unlock()
       }
-      registrar.unregister(this)
     }
 
     override suspend fun doWork(): Result {
@@ -92,7 +91,7 @@ class FlowTimeSessionWorker
       postForegroundNotification(
         id = FLOW_SESSION_FOREGROUND_NOTIFICATION_ID,
         title = "In the zone. $duration",
-        channel = FlowSessionNotificationChannel
+        channel = FlowSessionNotificationChannel,
       )
     }
 
@@ -100,31 +99,31 @@ class FlowTimeSessionWorker
       postForegroundNotification(
         id = BREAK_SESSION_FOREGROUND_NOTIFICATION_ID,
         title = "Taking a break. $duration",
-        channel = TakingABreakNotificationChannel
+        channel = TakingABreakNotificationChannel,
       )
     }
 
-  private suspend fun postForegroundNotification(
-    id: Int,
-    title: String,
-    channel: NotificationChannelSystem.NotificationChannel,
-  ) {
-    if (!work.isLocked) {
-      return
-    }
+    private suspend fun postForegroundNotification(
+      id: Int,
+      title: String,
+      channel: NotificationChannelSystem.NotificationChannel,
+    ) {
+      if (!work.isLocked) {
+        return
+      }
 
-    notificationPublisher.post(
-      worker = this@FlowTimeSessionWorker,
-      notification =
-      NotificationPublisher.Notification(
-        id = id,
-        title = title,
-        priority = NotificationCompat.PRIORITY_DEFAULT,
-        ongoing = true,
-      ),
-      channel = channel,
-    )
-  }
+      notificationPublisher.post(
+        worker = this@FlowTimeSessionWorker,
+        notification =
+          NotificationPublisher.Notification(
+            id = id,
+            title = title,
+            priority = NotificationCompat.PRIORITY_DEFAULT,
+            ongoing = true,
+          ),
+        channel = channel,
+      )
+    }
 
     @AssistedFactory
     interface Factory : WorkerFactory<FlowTimeSessionWorker>

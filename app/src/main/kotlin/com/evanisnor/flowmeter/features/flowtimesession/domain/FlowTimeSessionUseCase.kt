@@ -1,7 +1,6 @@
 package com.evanisnor.flowmeter.features.flowtimesession.domain
 
 import com.evanisnor.flowmeter.di.AppScope
-import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSessionUseCase.FlowState
 import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MainScope
@@ -43,24 +42,23 @@ interface FlowTimeSessionUseCase : Flow<FlowState> {
 
   suspend fun beginFlowSession()
 
-  suspend fun beginTakeABreak()
+  suspend fun beginTakeABreak(breakRecommendation: Duration)
 
-  fun stop()
+  suspend fun stop()
 }
 
 object NoOpFlowTimeSessionUseCase : FlowTimeSessionUseCase {
   override suspend fun beginFlowSession() = Unit
 
-  override suspend fun beginTakeABreak() = Unit
+  override suspend fun beginTakeABreak(breakRecommendation: Duration) = Unit
 
-  override fun stop() = Unit
+  override suspend fun stop() = Unit
 
   override suspend fun collect(collector: FlowCollector<FlowState>) = Unit
 }
 
 private val DEBUG_QUICK_BREAK_RECOMMENDATION = 5.seconds
 
-@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, FlowTimeSessionUseCase::class)
 class RealFlowTimeSessionUseCase
   @Inject
@@ -80,9 +78,6 @@ class RealFlowTimeSessionUseCase
 
     override suspend fun beginFlowSession() {
       Timber.i("Starting a new Flow session")
-      currentSession.get().stop()
-      isTakingABreak.set(false)
-      attentionGrabber.clearBreakIsOverNotification()
       flowTimeSessionProvider.get().let {
         currentSession.set(it)
         collectFromSession(it)
@@ -90,8 +85,13 @@ class RealFlowTimeSessionUseCase
       attentionGrabber.notifySessionStarted()
     }
 
-    override suspend fun beginTakeABreak() {
+    override suspend fun beginTakeABreak(breakRecommendation: Duration) {
       Timber.i("Taking a break")
+      if (settingsRepository.getDebugQuickBreaks()) {
+        this.breakRecommendation.set(DEBUG_QUICK_BREAK_RECOMMENDATION)
+      } else {
+        this.breakRecommendation.set(breakRecommendation)
+      }
       isTakingABreak.set(true)
       flowTimeSessionProvider.get().let {
         currentSession.set(it)
@@ -99,14 +99,14 @@ class RealFlowTimeSessionUseCase
       }
     }
 
-    override fun stop() {
+    override suspend fun stop() {
+      currentSession.get().stop()
       if (isTakingABreak.get()) {
         attentionGrabber.clearBreakIsOverNotification()
         Timber.i("Break is over")
       } else {
         Timber.i("Flow session is complete")
       }
-      currentSession.get().stop()
     }
 
     override suspend fun collect(collector: FlowCollector<FlowState>) = collector.emitAll(state)
@@ -127,30 +127,17 @@ class RealFlowTimeSessionUseCase
 
     private suspend fun processForSideEffects(state: FlowState) {
       when (state) {
-        is FlowState.Idle -> {
-          // No side-effects
-        }
-        is FlowState.InTheFlow -> {
-          // No side-effects
-        }
-        is FlowState.FlowComplete -> {
-          breakRecommendation.set(
-            if (settingsRepository.getDebugQuickBreaks()) {
-              DEBUG_QUICK_BREAK_RECOMMENDATION
-            } else {
-              state.recommendedBreak
-            },
-          )
-        }
         is FlowState.TakingABreak -> {
           if (state.isBreakLongerThanRecommended && !notifiedBreakIsOver.get()) {
             attentionGrabber.notifyBreakIsOver()
             notifiedBreakIsOver.set(true)
           }
         }
-        FlowState.BreakIsOver -> {
+        is FlowState.BreakIsOver -> {
+          isTakingABreak.set(false)
           notifiedBreakIsOver.set(false)
         }
+        else -> { /* No other side-effects */ }
       }
     }
 

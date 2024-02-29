@@ -6,6 +6,7 @@ import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.await
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.di.WorkerFactory
@@ -16,17 +17,11 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 interface WorkManagerSystem {
-  fun isRunning(worker: KClass<out ListenableWorker>): Boolean
-
   suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>): T
-
-  suspend fun <T : ListenableWorker> locate(worker: KClass<T>): T
 }
 
 interface WorkerRegistrar {
   fun <T : ListenableWorker> register(worker: T)
-
-  fun <T : ListenableWorker> unregister(worker: T)
 }
 
 @SingleIn(AppScope::class)
@@ -41,39 +36,30 @@ class WorkManagerSystemIntegration
       MutableMap<KClass<out ListenableWorker>, CompletableDeferred<ListenableWorker>> =
       mutableMapOf()
 
-    override fun isRunning(worker: KClass<out ListenableWorker>): Boolean =
-      workerMap.contains(
-        worker,
-      )
-
     override suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>): T {
-      Timber.d("Enqueue creation of worker ${worker::class.simpleName}")
+      Timber.d("Enqueue creation of worker ${worker.java.simpleName}")
       workManager.beginUniqueWork(
         worker.java.simpleName,
         ExistingWorkPolicy.REPLACE,
         OneTimeWorkRequest.Builder(worker.java).build(),
-      ).enqueue()
+      ).enqueue().await()
       return locate(worker)
     }
 
     override fun <T : ListenableWorker> register(worker: T) {
-      workerMap.getOrPut(worker::class, defaultValue = { CompletableDeferred() }).complete(worker)
-      Timber.d("Registered Worker ${worker::class.simpleName}:${worker.id}")
+      workerMap[worker::class]?.let {
+        it.complete(worker)
+        Timber.d("Registered Worker ${worker::class.simpleName}:${worker.id}")
+      }
     }
 
-    override fun <T : ListenableWorker> unregister(worker: T) {
-      workerMap.remove(worker::class)
-      Timber.d("Unregistered Worker ${worker::class.simpleName}:${worker.id}")
-    }
-
-    override suspend fun <T : ListenableWorker> locate(worker: KClass<T>): T {
+    private suspend fun <T : ListenableWorker> locate(worker: KClass<T>): T {
       val t0 = System.currentTimeMillis()
+      workerMap[worker]?.cancel()
+      workerMap[worker] = CompletableDeferred()
       @Suppress("UNCHECKED_CAST")
       return (
-        workerMap.getOrPut(
-          worker,
-          defaultValue = { CompletableDeferred() },
-        ).await() as T
+        workerMap[worker]?.await() as T
       ).also {
         Timber.d("Located ${worker.simpleName}:${it.id} in ${System.currentTimeMillis() - t0}ms")
       }
