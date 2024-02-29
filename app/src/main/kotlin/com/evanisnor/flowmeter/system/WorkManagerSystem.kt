@@ -47,6 +47,7 @@ class WorkManagerSystemIntegration
       )
 
     override suspend fun <T : ListenableWorker> runOnce(worker: KClass<T>): T {
+      Timber.d("Enqueue creation of worker ${worker::class.simpleName}")
       workManager.beginUniqueWork(
         worker.java.simpleName,
         ExistingWorkPolicy.REPLACE,
@@ -57,12 +58,12 @@ class WorkManagerSystemIntegration
 
     override fun <T : ListenableWorker> register(worker: T) {
       workerMap.getOrPut(worker::class, defaultValue = { CompletableDeferred() }).complete(worker)
-      Timber.d("Registered Worker ${worker::class.simpleName}")
+      Timber.d("Registered Worker ${worker::class.simpleName}:${worker.id}")
     }
 
     override fun <T : ListenableWorker> unregister(worker: T) {
       workerMap.remove(worker::class)
-      Timber.d("Unregistered Worker ${worker::class.simpleName}")
+      Timber.d("Unregistered Worker ${worker::class.simpleName}:${worker.id}")
     }
 
     override suspend fun <T : ListenableWorker> locate(worker: KClass<T>): T {
@@ -74,7 +75,7 @@ class WorkManagerSystemIntegration
           defaultValue = { CompletableDeferred() },
         ).await() as T
       ).also {
-        Timber.d("Located ${worker.simpleName} in ${System.currentTimeMillis() - t0}ms")
+        Timber.d("Located ${worker.simpleName}:${it.id} in ${System.currentTimeMillis() - t0}ms")
       }
     }
   }

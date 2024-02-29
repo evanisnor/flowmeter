@@ -13,10 +13,12 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
+import androidx.work.await
 import com.evanisnor.flowmeter.R
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
 import com.squareup.anvil.annotations.ContributesBinding
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
@@ -105,8 +107,9 @@ class NotificationSystemInterface
       notification: NotificationPublisher.Notification,
       channel: NotificationChannelSystem.NotificationChannel,
     ) {
-      if (isNotificationPermissionGranted()) {
+      if (isNotificationPermissionGranted() && !worker.isStopped) {
         notificationChannelSystem.notificationChannelId(channel)?.let { channelId ->
+          Timber.v("Posting ${worker::class.simpleName}:${worker.id} foreground notification [$channel <= $notification")
           worker.setForeground(
             ForegroundInfo(
               notification.id,

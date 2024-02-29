@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.WorkerFactory
 import com.evanisnor.flowmeter.di.WorkerKey
+import com.evanisnor.flowmeter.system.NotificationChannelSystem
 import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.FlowSessionNotificationChannel
 import com.evanisnor.flowmeter.system.NotificationChannelSystem.NotificationChannel.TakingABreakNotificationChannel
 import com.evanisnor.flowmeter.system.NotificationPublisher
@@ -22,6 +23,7 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
+import timber.log.Timber
 
 private const val FLOW_SESSION_FOREGROUND_NOTIFICATION_ID = 123156
 private const val BREAK_SESSION_FOREGROUND_NOTIFICATION_ID = 123157
@@ -80,45 +82,49 @@ class FlowTimeSessionWorker
 
     override suspend fun doWork(): Result {
       registrar.register(this)
+      Timber.i("${this::class.simpleName}:$id has started")
       work.lock()
+      Timber.i("${this::class.simpleName}:$id is completing with Result.success")
       return Result.success()
     }
 
     private suspend fun postFlowNotification(duration: String) {
-      if (!work.isLocked) {
-        return
-      }
-
-      notificationPublisher.post(
-        worker = this@FlowTimeSessionWorker,
-        notification =
-          NotificationPublisher.Notification(
-            id = FLOW_SESSION_FOREGROUND_NOTIFICATION_ID,
-            title = "In the zone. $duration",
-            priority = NotificationCompat.PRIORITY_DEFAULT,
-            ongoing = true,
-          ),
-        channel = FlowSessionNotificationChannel,
+      postForegroundNotification(
+        id = FLOW_SESSION_FOREGROUND_NOTIFICATION_ID,
+        title = "In the zone. $duration",
+        channel = FlowSessionNotificationChannel
       )
     }
 
     private suspend fun postBreakNotification(duration: String) {
-      if (!work.isLocked) {
-        return
-      }
-
-      notificationPublisher.post(
-        worker = this@FlowTimeSessionWorker,
-        notification =
-          NotificationPublisher.Notification(
-            id = BREAK_SESSION_FOREGROUND_NOTIFICATION_ID,
-            title = "Taking a break. $duration",
-            priority = NotificationCompat.PRIORITY_DEFAULT,
-            ongoing = true,
-          ),
-        channel = TakingABreakNotificationChannel,
+      postForegroundNotification(
+        id = BREAK_SESSION_FOREGROUND_NOTIFICATION_ID,
+        title = "Taking a break. $duration",
+        channel = TakingABreakNotificationChannel
       )
     }
+
+  private suspend fun postForegroundNotification(
+    id: Int,
+    title: String,
+    channel: NotificationChannelSystem.NotificationChannel,
+  ) {
+    if (!work.isLocked) {
+      return
+    }
+
+    notificationPublisher.post(
+      worker = this@FlowTimeSessionWorker,
+      notification =
+      NotificationPublisher.Notification(
+        id = id,
+        title = title,
+        priority = NotificationCompat.PRIORITY_DEFAULT,
+        ongoing = true,
+      ),
+      channel = channel,
+    )
+  }
 
     @AssistedFactory
     interface Factory : WorkerFactory<FlowTimeSessionWorker>
