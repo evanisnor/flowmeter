@@ -13,18 +13,18 @@ interface MediaPlayerSystem {
 
 @ContributesBinding(AppScope::class, MediaPlayerSystem::class)
 class MediaPlayerInterface
-  @Inject
-  constructor(
-    private val context: Context,
-    private val mediaPlayer: Provider<MediaPlayer>,
-  ) : MediaPlayerSystem {
-    override fun play(ringtoneSound: RingtoneSystem.RingtoneSound) {
-      mediaPlayer.get().apply {
-        setDataSource(context, ringtoneSound.uri)
-        prepare()
-        setOnCompletionListener {
-          release()
-        }
-      }.start()
-    }
+@Inject
+constructor(
+  private val context: Context,
+  private val mediaPlayer: Provider<MediaPlayer>,
+) : MediaPlayerSystem {
+  override fun play(ringtoneSound: RingtoneSystem.RingtoneSound) {
+    mediaPlayer.get().apply {
+      setDataSource(context, ringtoneSound.uri)
+      prepare()
+      setOnCompletionListener {
+        release()
+      }
+    }.start()
   }
+}

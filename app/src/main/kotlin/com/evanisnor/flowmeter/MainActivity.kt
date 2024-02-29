@@ -57,10 +57,10 @@ class MainActivity : ComponentActivity() {
 }
 
 class MainActivityAnvilInjector
-  @Inject
-  constructor(
-    override val injector: MembersInjector<MainActivity>,
-  ) : AnvilInjector<MainActivity>
+@Inject
+constructor(
+  override val injector: MembersInjector<MainActivity>,
+) : AnvilInjector<MainActivity>
 
 @Module
 @ContributesTo(AppScope::class)

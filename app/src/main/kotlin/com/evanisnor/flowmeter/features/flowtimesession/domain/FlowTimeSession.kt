@@ -47,45 +47,44 @@ object NoOpFlowTimeSession : FlowTimeSession {
  */
 @ContributesBinding(AppScope::class, FlowTimeSession::class)
 class FlowTimeSessionLogic
-  @Inject
-  constructor(
-    private val timeProvider: TimeProvider,
-  ) : FlowTimeSession {
-    private val isRunning: AtomicBoolean = AtomicBoolean(true)
-    private val stopping = Mutex(locked = true)
+@Inject
+constructor(
+  private val timeProvider: TimeProvider,
+) : FlowTimeSession {
+  private val isRunning: AtomicBoolean = AtomicBoolean(true)
+  private val stopping = Mutex(locked = true)
 
-    override suspend fun stop() {
-      isRunning.set(false)
-      stopping.lock()
-    }
-
-    override suspend fun collect(collector: FlowCollector<State>) {
-      Timber.d("Obtained collector")
-      val start = timeProvider.now().epochSecond.seconds
-      var sessionDuration = 0.seconds
-
-      while (isRunning.get()) {
-        sessionDuration = timeProvider.now().epochSecond.seconds - start
-        collector.emit(Tick(sessionDuration))
-        delay(1.seconds)
-      }
-
-      Complete(
-        sessionDuration = sessionDuration,
-        recommendedBreak = sessionDuration.recommendedBreak(),
-      ).run {
-        collector.emit(this)
-        Timber.i("Session complete")
-        stopping.unlock()
-      }
-    }
-
-    private fun Duration.recommendedBreak(): Duration =
-      when {
-        this < 25.minutes -> 5.minutes
-        this < 50.minutes -> 8.minutes
-        this < 90.minutes -> 10.minutes
-        this < 120.minutes -> 15.minutes
-        else -> 20.minutes
-      }
+  override suspend fun stop() {
+    isRunning.set(false)
+    stopping.lock()
   }
+
+  override suspend fun collect(collector: FlowCollector<State>) {
+    Timber.d("Obtained collector")
+    val start = timeProvider.now().epochSecond.seconds
+    var sessionDuration = 0.seconds
+
+    while (isRunning.get()) {
+      sessionDuration = timeProvider.now().epochSecond.seconds - start
+      collector.emit(Tick(sessionDuration))
+      delay(1.seconds)
+    }
+
+    Complete(
+      sessionDuration = sessionDuration,
+      recommendedBreak = sessionDuration.recommendedBreak(),
+    ).run {
+      collector.emit(this)
+      Timber.i("Session complete")
+      stopping.unlock()
+    }
+  }
+
+  private fun Duration.recommendedBreak(): Duration = when {
+    this < 25.minutes -> 5.minutes
+    this < 50.minutes -> 8.minutes
+    this < 90.minutes -> 10.minutes
+    this < 120.minutes -> 15.minutes
+    else -> 20.minutes
+  }
+}

@@ -7,10 +7,7 @@ import dagger.MapKey
 import kotlin.reflect.KClass
 
 interface WorkerFactory<T : ListenableWorker> {
-  fun create(
-    context: Context,
-    workerParameters: WorkerParameters,
-  ): T
+  fun create(context: Context, workerParameters: WorkerParameters): T
 }
 
 @Target(AnnotationTarget.FUNCTION)

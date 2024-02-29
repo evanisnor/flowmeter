@@ -27,10 +27,7 @@ import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun TakingABreakUi(
-  state: TakingABreak,
-  modifier: Modifier = Modifier,
-) {
+fun TakingABreakUi(state: TakingABreak, modifier: Modifier = Modifier) {
   BoxWithConstraints(
     modifier = modifier,
     contentAlignment = Alignment.Center,
@@ -66,10 +63,7 @@ private fun BreakImage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun BreakSessionControls(
-  state: TakingABreak,
-  modifier: Modifier = Modifier,
-) {
+private fun BreakSessionControls(state: TakingABreak, modifier: Modifier = Modifier) {
   Column(
     modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -83,11 +77,11 @@ private fun BreakSessionControls(
       text = state.duration,
       style = MaterialTheme.typography.displayLarge,
       color =
-        if (state.isBreakLongerThanRecommended) {
-          MaterialTheme.colorScheme.error
-        } else {
-          Color.Unspecified
-        },
+      if (state.isBreakLongerThanRecommended) {
+        MaterialTheme.colorScheme.error
+      } else {
+        Color.Unspecified
+      },
     )
     StopButton(
       onClick = { state.eventSink(SessionContent.SessionEvent.EndBreak) },
@@ -107,16 +101,16 @@ private fun TakingABreakPreview() {
       Scaffold { padding ->
         TakingABreakUi(
           modifier =
-            Modifier
-              .padding(padding)
-              .fillMaxSize(),
+          Modifier
+            .padding(padding)
+            .fillMaxSize(),
           state =
-            TakingABreak(
-              duration = "1:10:13",
-              breakRecommendation = 10.minutes,
-              isBreakLongerThanRecommended = true,
-              eventSink = {},
-            ),
+          TakingABreak(
+            duration = "1:10:13",
+            breakRecommendation = 10.minutes,
+            isBreakLongerThanRecommended = true,
+            eventSink = {},
+          ),
         )
       }
     }

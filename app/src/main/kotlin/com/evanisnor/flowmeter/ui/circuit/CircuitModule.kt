@@ -13,10 +13,7 @@ import dagger.Provides
 class CircuitModule {
   @JvmSuppressWildcards
   @Provides
-  fun circuit(
-    presenterFactories: Set<Presenter.Factory>,
-    uiFactories: Set<Ui.Factory>,
-  ): Circuit =
+  fun circuit(presenterFactories: Set<Presenter.Factory>, uiFactories: Set<Ui.Factory>): Circuit =
     Circuit.Builder()
       .addPresenterFactories(presenterFactories)
       .addUiFactories(uiFactories)

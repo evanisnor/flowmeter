@@ -61,107 +61,105 @@ private val DEBUG_QUICK_BREAK_RECOMMENDATION = 5.seconds
 
 @ContributesBinding(AppScope::class, FlowTimeSessionUseCase::class)
 class RealFlowTimeSessionUseCase
-  @Inject
-  constructor(
-    private val flowTimeSessionProvider: Provider<FlowTimeSession>,
-    private val attentionGrabber: AttentionGrabber,
-    private val settingsRepository: SettingsRepository,
-    private val timeFormatter: TimeFormatter,
-    @MainScope private val scope: CoroutineScope,
-  ) : FlowTimeSessionUseCase {
-    private val state: MutableStateFlow<FlowState> = MutableStateFlow(FlowState.Idle)
+@Inject
+constructor(
+  private val flowTimeSessionProvider: Provider<FlowTimeSession>,
+  private val attentionGrabber: AttentionGrabber,
+  private val settingsRepository: SettingsRepository,
+  private val timeFormatter: TimeFormatter,
+  @MainScope private val scope: CoroutineScope,
+) : FlowTimeSessionUseCase {
+  private val state: MutableStateFlow<FlowState> = MutableStateFlow(FlowState.Idle)
 
-    private val isTakingABreak = AtomicBoolean(false)
-    private val notifiedBreakIsOver = AtomicBoolean(false)
-    private val breakRecommendation = AtomicReference(0.minutes)
-    private val currentSession = AtomicReference<FlowTimeSession>(NoOpFlowTimeSession)
+  private val isTakingABreak = AtomicBoolean(false)
+  private val notifiedBreakIsOver = AtomicBoolean(false)
+  private val breakRecommendation = AtomicReference(0.minutes)
+  private val currentSession = AtomicReference<FlowTimeSession>(NoOpFlowTimeSession)
 
-    override suspend fun beginFlowSession() {
-      Timber.i("Starting a new Flow session")
-      flowTimeSessionProvider.get().let {
-        currentSession.set(it)
-        collectFromSession(it)
-      }
-      attentionGrabber.notifySessionStarted()
+  override suspend fun beginFlowSession() {
+    Timber.i("Starting a new Flow session")
+    flowTimeSessionProvider.get().let {
+      currentSession.set(it)
+      collectFromSession(it)
     }
-
-    override suspend fun beginTakeABreak(breakRecommendation: Duration) {
-      Timber.i("Taking a break")
-      if (settingsRepository.getDebugQuickBreaks()) {
-        this.breakRecommendation.set(DEBUG_QUICK_BREAK_RECOMMENDATION)
-      } else {
-        this.breakRecommendation.set(breakRecommendation)
-      }
-      isTakingABreak.set(true)
-      flowTimeSessionProvider.get().let {
-        currentSession.set(it)
-        collectFromSession(it)
-      }
-    }
-
-    override suspend fun stop() {
-      currentSession.get().stop()
-      if (isTakingABreak.get()) {
-        attentionGrabber.clearBreakIsOverNotification()
-        Timber.i("Break is over")
-      } else {
-        Timber.i("Flow session is complete")
-      }
-    }
-
-    override suspend fun collect(collector: FlowCollector<FlowState>) = collector.emitAll(state)
-
-    private fun collectFromSession(session: FlowTimeSession) {
-      scope.launch {
-        session.collect { sessionState ->
-          if (isTakingABreak.get()) {
-            sessionState.toBreakFlowState()
-          } else {
-            sessionState.toFlowState()
-          }
-            .also { processForSideEffects(it) }
-            .run { state.emit(this) }
-        }
-      }
-    }
-
-    private suspend fun processForSideEffects(state: FlowState) {
-      when (state) {
-        is FlowState.TakingABreak -> {
-          if (state.isBreakLongerThanRecommended && !notifiedBreakIsOver.get()) {
-            attentionGrabber.notifyBreakIsOver()
-            notifiedBreakIsOver.set(true)
-          }
-        }
-        is FlowState.BreakIsOver -> {
-          isTakingABreak.set(false)
-          notifiedBreakIsOver.set(false)
-        }
-        else -> { /* No other side-effects */ }
-      }
-    }
-
-    private fun FlowTimeSession.State.toFlowState() =
-      when (this) {
-        is FlowTimeSession.State.Tick ->
-          FlowState.InTheFlow(
-            duration = timeFormatter.humanReadableClock(duration),
-          )
-        is FlowTimeSession.State.Complete ->
-          FlowState.FlowComplete(
-            duration = timeFormatter.humanReadableSentence(sessionDuration),
-            recommendedBreak = recommendedBreak,
-          )
-      }
-
-    private fun FlowTimeSession.State.toBreakFlowState() =
-      when (this) {
-        is FlowTimeSession.State.Tick ->
-          FlowState.TakingABreak(
-            duration = timeFormatter.humanReadableClock(duration),
-            breakRecommendation = breakRecommendation.get(),
-            isBreakLongerThanRecommended = duration >= breakRecommendation.get(),
-          )
-        is FlowTimeSession.State.Complete -> FlowState.BreakIsOver
-      }
+    attentionGrabber.notifySessionStarted()
   }
+
+  override suspend fun beginTakeABreak(breakRecommendation: Duration) {
+    Timber.i("Taking a break")
+    if (settingsRepository.getDebugQuickBreaks()) {
+      this.breakRecommendation.set(DEBUG_QUICK_BREAK_RECOMMENDATION)
+    } else {
+      this.breakRecommendation.set(breakRecommendation)
+    }
+    isTakingABreak.set(true)
+    flowTimeSessionProvider.get().let {
+      currentSession.set(it)
+      collectFromSession(it)
+    }
+  }
+
+  override suspend fun stop() {
+    currentSession.get().stop()
+    if (isTakingABreak.get()) {
+      attentionGrabber.clearBreakIsOverNotification()
+      Timber.i("Break is over")
+    } else {
+      Timber.i("Flow session is complete")
+    }
+  }
+
+  override suspend fun collect(collector: FlowCollector<FlowState>) = collector.emitAll(state)
+
+  private fun collectFromSession(session: FlowTimeSession) {
+    scope.launch {
+      session.collect { sessionState ->
+        if (isTakingABreak.get()) {
+          sessionState.toBreakFlowState()
+        } else {
+          sessionState.toFlowState()
+        }
+          .also { processForSideEffects(it) }
+          .run { state.emit(this) }
+      }
+    }
+  }
+
+  private suspend fun processForSideEffects(state: FlowState) {
+    when (state) {
+      is FlowState.TakingABreak -> {
+        if (state.isBreakLongerThanRecommended && !notifiedBreakIsOver.get()) {
+          attentionGrabber.notifyBreakIsOver()
+          notifiedBreakIsOver.set(true)
+        }
+      }
+      is FlowState.BreakIsOver -> {
+        isTakingABreak.set(false)
+        notifiedBreakIsOver.set(false)
+      }
+      else -> { /* No other side-effects */ }
+    }
+  }
+
+  private fun FlowTimeSession.State.toFlowState() = when (this) {
+    is FlowTimeSession.State.Tick ->
+      FlowState.InTheFlow(
+        duration = timeFormatter.humanReadableClock(duration),
+      )
+    is FlowTimeSession.State.Complete ->
+      FlowState.FlowComplete(
+        duration = timeFormatter.humanReadableSentence(sessionDuration),
+        recommendedBreak = recommendedBreak,
+      )
+  }
+
+  private fun FlowTimeSession.State.toBreakFlowState() = when (this) {
+    is FlowTimeSession.State.Tick ->
+      FlowState.TakingABreak(
+        duration = timeFormatter.humanReadableClock(duration),
+        breakRecommendation = breakRecommendation.get(),
+        isBreakLongerThanRecommended = duration >= breakRecommendation.get(),
+      )
+    is FlowTimeSession.State.Complete -> FlowState.BreakIsOver
+  }
+}

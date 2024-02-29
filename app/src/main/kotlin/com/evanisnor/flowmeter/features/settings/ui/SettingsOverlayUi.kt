@@ -7,10 +7,7 @@ import com.slack.circuit.overlay.ContentWithOverlays
 import com.slack.circuit.overlay.OverlayEffect
 
 @Composable
-fun SettingsOverlayUi(
-  state: State?,
-  onResult: (OverlayResult) -> Unit,
-) {
+fun SettingsOverlayUi(state: State?, onResult: (OverlayResult) -> Unit) {
   check(state != null) { return }
 
   ContentWithOverlays {

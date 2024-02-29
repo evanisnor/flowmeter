@@ -15,12 +15,11 @@ import javax.inject.Singleton
 class SessionDataModule {
   @Provides
   @Singleton
-  fun sqlDriver(context: Context): SqlDriver =
-    AndroidSqliteDriver(
-      Database.Schema,
-      context,
-      "sessions.db",
-    )
+  fun sqlDriver(context: Context): SqlDriver = AndroidSqliteDriver(
+    Database.Schema,
+    context,
+    "sessions.db",
+  )
 
   @Provides
   fun database(sqlDriver: SqlDriver): Database = Database(sqlDriver)

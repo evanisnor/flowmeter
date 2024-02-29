@@ -15,10 +15,7 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.StartNew
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 
 @Composable
-fun StartNewUi(
-  state: StartNew,
-  modifier: Modifier = Modifier,
-) {
+fun StartNewUi(state: StartNew, modifier: Modifier = Modifier) {
   Box(
     modifier = modifier,
     contentAlignment = Alignment.Center,
@@ -38,9 +35,9 @@ private fun StartNewPreview() {
       Scaffold { padding ->
         StartNewUi(
           modifier =
-            Modifier
-              .padding(padding)
-              .fillMaxSize(),
+          Modifier
+            .padding(padding)
+            .fillMaxSize(),
           state = StartNew(eventSink = {}),
         )
       }

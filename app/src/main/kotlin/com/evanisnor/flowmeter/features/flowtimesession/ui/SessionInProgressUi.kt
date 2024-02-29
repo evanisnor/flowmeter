@@ -20,10 +20,7 @@ import com.evanisnor.flowmeter.features.flowtimesession.SessionContent.SessionIn
 import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 
 @Composable
-fun SessionInProgressUi(
-  state: SessionInProgress,
-  modifier: Modifier = Modifier,
-) {
+fun SessionInProgressUi(state: SessionInProgress, modifier: Modifier = Modifier) {
   Box(
     modifier = modifier,
     contentAlignment = Alignment.Center,
@@ -52,14 +49,14 @@ private fun SessionInProgressPreview() {
       Scaffold { padding ->
         SessionInProgressUi(
           modifier =
-            Modifier
-              .padding(padding)
-              .fillMaxSize(),
+          Modifier
+            .padding(padding)
+            .fillMaxSize(),
           state =
-            SessionInProgress(
-              duration = "1:10:13",
-              eventSink = {},
-            ),
+          SessionInProgress(
+            duration = "1:10:13",
+            eventSink = {},
+          ),
         )
       }
     }

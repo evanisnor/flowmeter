@@ -37,97 +37,97 @@ suspend fun WorkManagerSystem.startFlowTimeSession(): FlowTimeSessionUseCase {
 }
 
 class FlowTimeSessionWorker
-  @AssistedInject
-  constructor(
-    @Assisted context: Context,
-    @Assisted workerParameters: WorkerParameters,
-    private val flowTimeSessionUseCase: FlowTimeSessionUseCase,
-    private val registrar: WorkerRegistrar,
-    private val notificationPublisher: NotificationPublisher,
-  ) : CoroutineWorker(context, workerParameters), FlowTimeSessionUseCase {
-    private val work: Mutex = Mutex(locked = true)
+@AssistedInject
+constructor(
+  @Assisted context: Context,
+  @Assisted workerParameters: WorkerParameters,
+  private val flowTimeSessionUseCase: FlowTimeSessionUseCase,
+  private val registrar: WorkerRegistrar,
+  private val notificationPublisher: NotificationPublisher,
+) : CoroutineWorker(context, workerParameters), FlowTimeSessionUseCase {
+  private val work: Mutex = Mutex(locked = true)
 
-    override suspend fun beginFlowSession() = flowTimeSessionUseCase.beginFlowSession()
+  override suspend fun beginFlowSession() = flowTimeSessionUseCase.beginFlowSession()
 
-    override suspend fun beginTakeABreak(breakRecommendation: Duration) =
-      flowTimeSessionUseCase.beginTakeABreak(
-        breakRecommendation,
-      )
+  override suspend fun beginTakeABreak(breakRecommendation: Duration) =
+    flowTimeSessionUseCase.beginTakeABreak(
+      breakRecommendation,
+    )
 
-    override suspend fun collect(collector: FlowCollector<FlowTimeSessionUseCase.FlowState>) {
-      flowTimeSessionUseCase.collectLatest { state ->
-        // Intercept flow state so we can update the Foreground Notification
-        when (state) {
-          is FlowTimeSessionUseCase.FlowState.InTheFlow ->
-            postFlowNotification(
-              state.duration,
-            )
-          is FlowTimeSessionUseCase.FlowState.TakingABreak ->
-            postBreakNotification(
-              state.duration,
-            )
-          else -> { /* State ignored */ }
-        }
-        collector.emit(state)
+  override suspend fun collect(collector: FlowCollector<FlowTimeSessionUseCase.FlowState>) {
+    flowTimeSessionUseCase.collectLatest { state ->
+      // Intercept flow state so we can update the Foreground Notification
+      when (state) {
+        is FlowTimeSessionUseCase.FlowState.InTheFlow ->
+          postFlowNotification(
+            state.duration,
+          )
+        is FlowTimeSessionUseCase.FlowState.TakingABreak ->
+          postBreakNotification(
+            state.duration,
+          )
+        else -> { /* State ignored */ }
       }
+      collector.emit(state)
     }
-
-    override suspend fun stop() {
-      flowTimeSessionUseCase.stop()
-      if (work.isLocked) {
-        work.unlock()
-      }
-    }
-
-    override suspend fun doWork(): Result {
-      registrar.register(this)
-      Timber.i("${this::class.simpleName}:$id has started")
-      work.lock()
-      Timber.i("${this::class.simpleName}:$id is completing with Result.success")
-      return Result.success()
-    }
-
-    private suspend fun postFlowNotification(duration: String) {
-      postForegroundNotification(
-        id = FLOW_SESSION_FOREGROUND_NOTIFICATION_ID,
-        title = "In the zone. $duration",
-        channel = FlowSessionNotificationChannel,
-      )
-    }
-
-    private suspend fun postBreakNotification(duration: String) {
-      postForegroundNotification(
-        id = BREAK_SESSION_FOREGROUND_NOTIFICATION_ID,
-        title = "Taking a break. $duration",
-        channel = TakingABreakNotificationChannel,
-      )
-    }
-
-    private suspend fun postForegroundNotification(
-      id: Int,
-      title: String,
-      channel: NotificationChannelSystem.NotificationChannel,
-    ) {
-      if (!work.isLocked) {
-        return
-      }
-
-      notificationPublisher.post(
-        worker = this@FlowTimeSessionWorker,
-        notification =
-          NotificationPublisher.Notification(
-            id = id,
-            title = title,
-            priority = NotificationCompat.PRIORITY_DEFAULT,
-            ongoing = true,
-          ),
-        channel = channel,
-      )
-    }
-
-    @AssistedFactory
-    interface Factory : WorkerFactory<FlowTimeSessionWorker>
   }
+
+  override suspend fun stop() {
+    flowTimeSessionUseCase.stop()
+    if (work.isLocked) {
+      work.unlock()
+    }
+  }
+
+  override suspend fun doWork(): Result {
+    registrar.register(this)
+    Timber.i("${this::class.simpleName}:$id has started")
+    work.lock()
+    Timber.i("${this::class.simpleName}:$id is completing with Result.success")
+    return Result.success()
+  }
+
+  private suspend fun postFlowNotification(duration: String) {
+    postForegroundNotification(
+      id = FLOW_SESSION_FOREGROUND_NOTIFICATION_ID,
+      title = "In the zone. $duration",
+      channel = FlowSessionNotificationChannel,
+    )
+  }
+
+  private suspend fun postBreakNotification(duration: String) {
+    postForegroundNotification(
+      id = BREAK_SESSION_FOREGROUND_NOTIFICATION_ID,
+      title = "Taking a break. $duration",
+      channel = TakingABreakNotificationChannel,
+    )
+  }
+
+  private suspend fun postForegroundNotification(
+    id: Int,
+    title: String,
+    channel: NotificationChannelSystem.NotificationChannel,
+  ) {
+    if (!work.isLocked) {
+      return
+    }
+
+    notificationPublisher.post(
+      worker = this@FlowTimeSessionWorker,
+      notification =
+      NotificationPublisher.Notification(
+        id = id,
+        title = title,
+        priority = NotificationCompat.PRIORITY_DEFAULT,
+        ongoing = true,
+      ),
+      channel = channel,
+    )
+  }
+
+  @AssistedFactory
+  interface Factory : WorkerFactory<FlowTimeSessionWorker>
+}
 
 @Module
 @ContributesTo(AppScope::class)

@@ -77,67 +77,67 @@ interface NotificationChannelSystem {
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, NotificationChannelSystem::class)
 class NotificationChannelSystemInterface
-  @Inject
-  constructor(
-    private val context: Context,
-    private val notificationManager: NotificationManagerCompat,
-    private val ringtoneSystem: RingtoneSystem,
-    private val audioAttributes: AudioAttributes,
-    private val resources: Resources,
-  ) : NotificationChannelSystem {
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-      name = "notifications",
-    )
+@Inject
+constructor(
+  private val context: Context,
+  private val notificationManager: NotificationManagerCompat,
+  private val ringtoneSystem: RingtoneSystem,
+  private val audioAttributes: AudioAttributes,
+  private val resources: Resources,
+) : NotificationChannelSystem {
+  private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+    name = "notifications",
+  )
 
-    override suspend fun notificationChannelId(
-      channel: NotificationChannelSystem.NotificationChannel,
-    ) = context.dataStore.data.map { preferences ->
-      preferences[stringPreferencesKey(channel.name)]
-    }.first()
+  override suspend fun notificationChannelId(
+    channel: NotificationChannelSystem.NotificationChannel,
+  ) = context.dataStore.data.map { preferences ->
+    preferences[stringPreferencesKey(channel.name)]
+  }.first()
 
-    override suspend fun createNotificationChannel(
-      channel: NotificationChannelSystem.NotificationChannel,
-      settings: NotificationChannelSystem.NotificationChannelSettings?,
-    ) {
-      val existingChannelId = notificationChannelId(channel)
-      if (existingChannelId != null && settings == null) {
-        return
-      }
-
-      // Delete the previous Notification Channel so we can re-create it with the chosen sound.
-      existingChannelId?.let { notificationManager.deleteNotificationChannel(it) }
-      val newChannelId = channel.name + "|${System.currentTimeMillis()}"
-      saveNotificationChannelId(channel, newChannelId)
-
-      val sound =
-        settings?.sound?.uri ?: if (channel.useDefaultSound) {
-          ringtoneSystem.getDefaultSound().uri
-        } else {
-          null
-        }
-      val vibrate = settings?.vibrate ?: channel.defaultVibrate
-
-      NotificationChannelCompat.Builder(newChannelId, channel.importance)
-        .setName(resources.getString(R.string.notification_channel_session))
-        .setDescription(resources.getString(R.string.notification_channel_session_description))
-        .setSound(sound, audioAttributes)
-        .setVibrationEnabled(vibrate)
-        .apply {
-          if (vibrate) {
-            setVibrationPattern(VIBRATION_PATTERN)
-          }
-        }
-        .build().let {
-          notificationManager.createNotificationChannel(it)
-        }
+  override suspend fun createNotificationChannel(
+    channel: NotificationChannelSystem.NotificationChannel,
+    settings: NotificationChannelSystem.NotificationChannelSettings?,
+  ) {
+    val existingChannelId = notificationChannelId(channel)
+    if (existingChannelId != null && settings == null) {
+      return
     }
 
-    private suspend fun saveNotificationChannelId(
-      channel: NotificationChannelSystem.NotificationChannel,
-      id: String,
-    ) {
-      context.dataStore.edit { preferences ->
-        preferences[stringPreferencesKey(channel.name)] = id
+    // Delete the previous Notification Channel so we can re-create it with the chosen sound.
+    existingChannelId?.let { notificationManager.deleteNotificationChannel(it) }
+    val newChannelId = channel.name + "|${System.currentTimeMillis()}"
+    saveNotificationChannelId(channel, newChannelId)
+
+    val sound =
+      settings?.sound?.uri ?: if (channel.useDefaultSound) {
+        ringtoneSystem.getDefaultSound().uri
+      } else {
+        null
       }
+    val vibrate = settings?.vibrate ?: channel.defaultVibrate
+
+    NotificationChannelCompat.Builder(newChannelId, channel.importance)
+      .setName(resources.getString(R.string.notification_channel_session))
+      .setDescription(resources.getString(R.string.notification_channel_session_description))
+      .setSound(sound, audioAttributes)
+      .setVibrationEnabled(vibrate)
+      .apply {
+        if (vibrate) {
+          setVibrationPattern(VIBRATION_PATTERN)
+        }
+      }
+      .build().let {
+        notificationManager.createNotificationChannel(it)
+      }
+  }
+
+  private suspend fun saveNotificationChannelId(
+    channel: NotificationChannelSystem.NotificationChannel,
+    id: String,
+  ) {
+    context.dataStore.edit { preferences ->
+      preferences[stringPreferencesKey(channel.name)] = id
     }
   }
+}

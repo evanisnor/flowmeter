@@ -28,78 +28,78 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 class SessionContentPresenter
-  @Inject
-  constructor(
-    private val workManagerSystem: WorkManagerSystem,
-    @MainScope private val scope: CoroutineScope,
-  ) : Presenter<SessionContent> {
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Composable
-    override fun present(): SessionContent {
-      val session =
-        rememberRetained {
-          mutableStateOf<FlowTimeSessionUseCase>(NoOpFlowTimeSessionUseCase)
-        }
-      val breakRecommendation = rememberRetained { mutableStateOf(0.seconds) }
+@Inject
+constructor(
+  private val workManagerSystem: WorkManagerSystem,
+  @MainScope private val scope: CoroutineScope,
+) : Presenter<SessionContent> {
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Composable
+  override fun present(): SessionContent {
+    val session =
+      rememberRetained {
+        mutableStateOf<FlowTimeSessionUseCase>(NoOpFlowTimeSessionUseCase)
+      }
+    val breakRecommendation = rememberRetained { mutableStateOf(0.seconds) }
 
-      val eventSink: (SessionEvent) -> Unit = { event ->
-        scope.launch {
-          when (event) {
-            is NewSession -> {
-              session.value = newSession()
-              session.value.beginFlowSession()
-            }
-            is EndSession -> {
-              session.value.stop()
-            }
-            is TakeABreak -> {
-              session.value = newSession()
-              session.value.beginTakeABreak(breakRecommendation.value)
-            }
-            is EndBreak -> {
-              session.value.stop()
-            }
+    val eventSink: (SessionEvent) -> Unit = { event ->
+      scope.launch {
+        when (event) {
+          is NewSession -> {
+            session.value = newSession()
+            session.value.beginFlowSession()
+          }
+          is EndSession -> {
+            session.value.stop()
+          }
+          is TakeABreak -> {
+            session.value = newSession()
+            session.value.beginTakeABreak(breakRecommendation.value)
+          }
+          is EndBreak -> {
+            session.value.stop()
           }
         }
       }
-
-      val sessionContent by produceRetainedState<SessionContent>(
-        initialValue = StartNew(eventSink),
-        key1 = session.value,
-      ) {
-        snapshotFlow { session.value }.flattenConcat().collect { flowState ->
-          value =
-            when (flowState) {
-              is FlowTimeSessionUseCase.FlowState.InTheFlow ->
-                SessionInProgress(
-                  duration = flowState.duration,
-                  eventSink = eventSink,
-                )
-              is FlowTimeSessionUseCase.FlowState.FlowComplete ->
-                SessionComplete(
-                  duration = flowState.duration,
-                  breakRecommendation = flowState.recommendedBreak,
-                  eventSink = eventSink,
-                ).also {
-                  breakRecommendation.value = flowState.recommendedBreak
-                }
-              is FlowTimeSessionUseCase.FlowState.TakingABreak ->
-                SessionContent.TakingABreak(
-                  duration = flowState.duration,
-                  breakRecommendation = flowState.breakRecommendation,
-                  isBreakLongerThanRecommended = flowState.isBreakLongerThanRecommended,
-                  eventSink = eventSink,
-                )
-              is FlowTimeSessionUseCase.FlowState.Idle,
-              is FlowTimeSessionUseCase.FlowState.BreakIsOver,
-              -> StartNew(eventSink)
-            }
-        }
-      }
-
-      return sessionContent
     }
 
-    private suspend fun newSession(): FlowTimeSessionUseCase =
-      workManagerSystem.startFlowTimeSession()
+    val sessionContent by produceRetainedState<SessionContent>(
+      initialValue = StartNew(eventSink),
+      key1 = session.value,
+    ) {
+      snapshotFlow { session.value }.flattenConcat().collect { flowState ->
+        value =
+          when (flowState) {
+            is FlowTimeSessionUseCase.FlowState.InTheFlow ->
+              SessionInProgress(
+                duration = flowState.duration,
+                eventSink = eventSink,
+              )
+            is FlowTimeSessionUseCase.FlowState.FlowComplete ->
+              SessionComplete(
+                duration = flowState.duration,
+                breakRecommendation = flowState.recommendedBreak,
+                eventSink = eventSink,
+              ).also {
+                breakRecommendation.value = flowState.recommendedBreak
+              }
+            is FlowTimeSessionUseCase.FlowState.TakingABreak ->
+              SessionContent.TakingABreak(
+                duration = flowState.duration,
+                breakRecommendation = flowState.breakRecommendation,
+                isBreakLongerThanRecommended = flowState.isBreakLongerThanRecommended,
+                eventSink = eventSink,
+              )
+            is FlowTimeSessionUseCase.FlowState.Idle,
+            is FlowTimeSessionUseCase.FlowState.BreakIsOver,
+            -> StartNew(eventSink)
+          }
+      }
+    }
+
+    return sessionContent
   }
+
+  private suspend fun newSession(): FlowTimeSessionUseCase =
+    workManagerSystem.startFlowTimeSession()
+}

@@ -26,10 +26,7 @@ import androidx.compose.ui.unit.dp
 import kotlin.time.Duration
 
 @Composable
-fun NewSessionButton(
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
+fun NewSessionButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
   Button(
     modifier = modifier,
     text = AnnotatedString("Start a new session"),
@@ -41,10 +38,7 @@ fun NewSessionButton(
 }
 
 @Composable
-fun StopButton(
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
+fun StopButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
   Button(
     modifier = modifier,
     text = AnnotatedString("Stop"),
@@ -56,21 +50,17 @@ fun StopButton(
 }
 
 @Composable
-fun TakeABreakButton(
-  duration: Duration,
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
+fun TakeABreakButton(duration: Duration, onClick: () -> Unit, modifier: Modifier = Modifier) {
   Button(
     modifier = modifier,
     text =
-      buildAnnotatedString {
-        append("Take a ")
-        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-          append(duration.inWholeMinutes.toString())
-        }
-        append(" minute break")
-      },
+    buildAnnotatedString {
+      append("Take a ")
+      withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+        append(duration.inWholeMinutes.toString())
+      }
+      append(" minute break")
+    },
     icon = Icons.Filled.Favorite,
     backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
     textColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -89,9 +79,9 @@ private fun Button(
 ) {
   TextButton(
     modifier =
-      modifier
-        .clip(RoundedCornerShape(8.dp))
-        .background(backgroundColor),
+    modifier
+      .clip(RoundedCornerShape(8.dp))
+      .background(backgroundColor),
     onClick = onClick,
   ) {
     Icon(

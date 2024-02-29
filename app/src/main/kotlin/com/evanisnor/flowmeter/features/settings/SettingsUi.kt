@@ -48,10 +48,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @CircuitInject(SettingsScreen::class, AppScope::class)
 @Composable
-fun SettingsUi(
-  state: State,
-  modifier: Modifier = Modifier,
-) {
+fun SettingsUi(state: State, modifier: Modifier = Modifier) {
   FlowmeterTheme {
     Scaffold(
       modifier = modifier,
@@ -61,10 +58,10 @@ fun SettingsUi(
     ) { padding ->
       SettingsList(
         modifier =
-          Modifier
-            .padding(padding)
-            .consumeWindowInsets(padding)
-            .fillMaxWidth(),
+        Modifier
+          .padding(padding)
+          .consumeWindowInsets(padding)
+          .fillMaxWidth(),
         state = state,
         onFieldSelected = { field ->
           state.eventSink(SettingsScreen.Event.FieldSelected(field))
@@ -142,16 +139,13 @@ private fun SettingsList(
  * For consistent styling of items in the LazyColumn
  */
 @Composable
-private fun ColumnItem(
-  modifier: Modifier = Modifier,
-  content: @Composable () -> Unit,
-) {
+private fun ColumnItem(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
   Box(
     modifier =
-      modifier
-        .defaultMinSize(minHeight = 52.dp)
-        .padding(horizontal = 16.dp)
-        .fillMaxWidth(),
+    modifier
+      .defaultMinSize(minHeight = 52.dp)
+      .padding(horizontal = 16.dp)
+      .fillMaxWidth(),
     contentAlignment = Alignment.CenterStart,
   ) {
     content()
@@ -159,10 +153,7 @@ private fun ColumnItem(
 }
 
 @Composable
-private fun GroupHeadingItem(
-  groupHeading: GroupHeading,
-  modifier: Modifier = Modifier,
-) {
+private fun GroupHeadingItem(groupHeading: GroupHeading, modifier: Modifier = Modifier) {
   Row(
     modifier = modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
@@ -176,10 +167,7 @@ private fun GroupHeadingItem(
 }
 
 @Composable
-private fun SettingItem(
-  setting: Setting,
-  modifier: Modifier = Modifier,
-) {
+private fun SettingItem(setting: Setting, modifier: Modifier = Modifier) {
   Column(
     modifier = modifier.fillMaxWidth(),
   ) {
@@ -218,10 +206,7 @@ private fun ToggleItem(
 }
 
 @Composable
-private fun DisplayValueItem(
-  displayValue: DisplayValue,
-  modifier: Modifier = Modifier,
-) {
+private fun DisplayValueItem(displayValue: DisplayValue, modifier: Modifier = Modifier) {
   Column(
     modifier = modifier.fillMaxWidth(),
   ) {
@@ -238,10 +223,7 @@ private fun DisplayValueItem(
 }
 
 @Composable
-private fun MoreInformationItem(
-  moreInformation: MoreInformation,
-  modifier: Modifier = Modifier,
-) {
+private fun MoreInformationItem(moreInformation: MoreInformation, modifier: Modifier = Modifier) {
   Text(
     modifier = modifier.fillMaxWidth(),
     text = moreInformation.label,
@@ -254,41 +236,41 @@ private fun MoreInformationItem(
 private fun SettingsUiPreview() {
   SettingsUi(
     state =
-      State(
-        settingsItems =
-          persistentListOf(
-            GroupHeading(icon = Icons.Filled.Notifications, label = "Notifications"),
-            Setting(
-              field = "",
-              label = "Sound one",
-              currentValue = "Ringtone 1",
-            ),
-            Setting(
-              field = "",
-              label = "Sound two",
-              currentValue = "Ringtone 2",
-            ),
-            Toggle(
-              field = "",
-              label = "Vibrate?",
-              currentValue = true,
-            ),
-            Divider,
-            GroupHeading(icon = Icons.Filled.Info, label = "Information"),
-            DisplayValue(
-              label = "App version",
-              value = "0.1.0",
-            ),
-            MoreInformation(
-              field = "",
-              label = "Privacy policy",
-            ),
-            MoreInformation(
-              field = "",
-              label = "Open source attribution",
-            ),
-          ),
-        eventSink = {},
+    State(
+      settingsItems =
+      persistentListOf(
+        GroupHeading(icon = Icons.Filled.Notifications, label = "Notifications"),
+        Setting(
+          field = "",
+          label = "Sound one",
+          currentValue = "Ringtone 1",
+        ),
+        Setting(
+          field = "",
+          label = "Sound two",
+          currentValue = "Ringtone 2",
+        ),
+        Toggle(
+          field = "",
+          label = "Vibrate?",
+          currentValue = true,
+        ),
+        Divider,
+        GroupHeading(icon = Icons.Filled.Info, label = "Information"),
+        DisplayValue(
+          label = "App version",
+          value = "0.1.0",
+        ),
+        MoreInformation(
+          field = "",
+          label = "Privacy policy",
+        ),
+        MoreInformation(
+          field = "",
+          label = "Open source attribution",
+        ),
       ),
+      eventSink = {},
+    ),
   )
 }

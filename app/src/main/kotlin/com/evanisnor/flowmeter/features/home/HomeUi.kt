@@ -45,10 +45,7 @@ import com.slack.circuit.codegen.annotations.CircuitInject
 @CircuitInject(HomeScreen::class, AppScope::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeUi(
-  state: State,
-  modifier: Modifier = Modifier,
-) {
+fun HomeUi(state: State, modifier: Modifier = Modifier) {
   FlowmeterTheme {
     Scaffold(
       modifier = modifier,
@@ -140,10 +137,10 @@ private fun HomeUiPreview() {
     Surface {
       HomeUi(
         state =
-          State(
-            sessionContent = StartNew(eventSink = {}),
-            eventSink = {},
-          ),
+        State(
+          sessionContent = StartNew(eventSink = {}),
+          eventSink = {},
+        ),
       )
     }
   }

@@ -53,11 +53,11 @@ class SoundPickerOverlay(
         items(state.availableSounds) { sound ->
           Row(
             modifier =
-              Modifier
-                .defaultMinSize(minHeight = 48.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .clickable { navigator.finish(OverlayResult.SelectSound(state.field, sound)) },
+            Modifier
+              .defaultMinSize(minHeight = 48.dp)
+              .fillMaxWidth()
+              .padding(horizontal = 16.dp)
+              .clickable { navigator.finish(OverlayResult.SelectSound(state.field, sound)) },
             verticalAlignment = Alignment.CenterVertically,
           ) {
             RadioButton(

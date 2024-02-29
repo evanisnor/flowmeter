@@ -28,10 +28,7 @@ import com.evanisnor.flowmeter.ui.theme.FlowmeterTheme
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun SessionCompleteUi(
-  state: SessionComplete,
-  modifier: Modifier = Modifier,
-) {
+fun SessionCompleteUi(state: SessionComplete, modifier: Modifier = Modifier) {
   Box(
     modifier = modifier,
     contentAlignment = Alignment.Center,
@@ -50,11 +47,11 @@ fun SessionCompleteUi(
         modifier = Modifier.width(300.dp),
         textAlign = TextAlign.Center,
         text =
-          buildAnnotatedString {
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-              append(state.duration)
-            }
-          },
+        buildAnnotatedString {
+          withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+            append(state.duration)
+          }
+        },
         style = MaterialTheme.typography.headlineMedium,
       )
 
@@ -78,15 +75,15 @@ private fun SessionCompletePreview() {
       Scaffold { padding ->
         SessionCompleteUi(
           modifier =
-            Modifier
-              .padding(padding)
-              .fillMaxSize(),
+          Modifier
+            .padding(padding)
+            .fillMaxSize(),
           state =
-            SessionComplete(
-              duration = "1 hour and 24 minutes",
-              breakRecommendation = 10.minutes,
-              eventSink = {},
-            ),
+          SessionComplete(
+            duration = "1 hour and 24 minutes",
+            breakRecommendation = 10.minutes,
+            eventSink = {},
+          ),
         )
       }
     }

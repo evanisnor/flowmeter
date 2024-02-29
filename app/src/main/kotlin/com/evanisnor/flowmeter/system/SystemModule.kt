@@ -38,17 +38,15 @@ object SystemModule {
     NotificationManagerCompat.from(context)
 
   @Provides
-  fun audioAttributes(): AudioAttributes =
-    AudioAttributes.Builder()
-      .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-      .setUsage(AudioAttributes.USAGE_MEDIA)
-      .build()
+  fun audioAttributes(): AudioAttributes = AudioAttributes.Builder()
+    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+    .setUsage(AudioAttributes.USAGE_MEDIA)
+    .build()
 
   @Provides
-  fun mediaPlayer(audioAttributes: AudioAttributes): MediaPlayer =
-    MediaPlayer().apply {
-      setAudioAttributes(audioAttributes)
-    }
+  fun mediaPlayer(audioAttributes: AudioAttributes): MediaPlayer = MediaPlayer().apply {
+    setAudioAttributes(audioAttributes)
+  }
 
   @Provides
   fun workManager(context: Context): WorkManager = WorkManager.getInstance(context)

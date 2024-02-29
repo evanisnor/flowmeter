@@ -13,10 +13,10 @@ interface TimeProvider {
 
 @ContributesBinding(AppScope::class, TimeProvider::class)
 class RealTimeProvider
-  @Inject
-  constructor() : TimeProvider {
-    override fun now(): Instant = Instant.now()
-  }
+@Inject
+constructor() : TimeProvider {
+  override fun now(): Instant = Instant.now()
+}
 
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 class FakeTimeProvider(
