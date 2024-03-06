@@ -6,6 +6,8 @@ import com.evanisnor.flowmeter.features.settings.data.SettingsRepository
 import com.evanisnor.flowmeter.system.MainScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,12 +77,13 @@ constructor(
   private val notifiedBreakIsOver = AtomicBoolean(false)
   private val breakRecommendation = AtomicReference(0.minutes)
   private val currentSession = AtomicReference<FlowTimeSession>(NoOpFlowTimeSession)
+  private val currentCollectJob = AtomicReference<Job?>(null)
 
   override suspend fun beginFlowSession() {
     Timber.i("Starting a new Flow session")
     flowTimeSessionProvider.get().let {
       currentSession.set(it)
-      collectFromSession(it)
+      collectFromSession(it).let { currentCollectJob.set(it) }
     }
     attentionGrabber.notifySessionStarted()
   }
@@ -95,7 +98,7 @@ constructor(
     isTakingABreak.set(true)
     flowTimeSessionProvider.get().let {
       currentSession.set(it)
-      collectFromSession(it)
+      collectFromSession(it).let { currentCollectJob.set(it) }
     }
   }
 
@@ -108,21 +111,20 @@ constructor(
       currentSession.get().stop()
       Timber.i("Flow session is complete")
     }
+    currentCollectJob.get()?.cancel()
   }
 
   override suspend fun collect(collector: FlowCollector<FlowState>) = collector.emitAll(state)
 
-  private fun collectFromSession(session: FlowTimeSession) {
-    scope.launch {
-      session.collect { sessionState ->
-        if (isTakingABreak.get()) {
-          sessionState.toBreakFlowState()
-        } else {
-          sessionState.toFlowState()
-        }
-          .also { processForSideEffects(it) }
-          .run { state.emit(this) }
+  private fun collectFromSession(session: FlowTimeSession) = scope.launch {
+    session.collect { sessionState ->
+      if (isTakingABreak.get()) {
+        sessionState.toBreakFlowState()
+      } else {
+        sessionState.toFlowState()
       }
+        .also { processForSideEffects(it) }
+        .run { state.emit(this) }
     }
   }
 
