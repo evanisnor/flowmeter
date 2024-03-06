@@ -1,7 +1,6 @@
 package com.evanisnor.flowmeter.features.settings.data
 
 import android.content.Context
-import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
@@ -138,7 +137,6 @@ constructor(
   private fun Preferences.readToggle(key: String, defaultValue: Boolean): Boolean =
     get(booleanPreferencesKey(key)) ?: defaultValue
 }
-
 
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 class FakeSettingsRepository : SettingsRepository {

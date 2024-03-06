@@ -3,7 +3,6 @@ package com.evanisnor.flowmeter.system
 import android.app.Activity
 import android.content.Context
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Parcelable
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.di.SingleIn
