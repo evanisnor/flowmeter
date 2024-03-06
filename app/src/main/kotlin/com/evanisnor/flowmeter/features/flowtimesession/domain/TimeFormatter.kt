@@ -1,12 +1,19 @@
 package com.evanisnor.flowmeter.features.flowtimesession.domain
 
+import androidx.annotation.VisibleForTesting
+import com.evanisnor.flowmeter.di.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlin.time.Duration
 
-class TimeFormatter
-@Inject
-constructor() {
-  fun humanReadableClock(duration: Duration): String {
+interface TimeFormatter {
+  fun humanReadableClock(duration: Duration): String
+  fun humanReadableSentence(duration: Duration): String
+}
+
+@ContributesBinding(AppScope::class, TimeFormatter::class)
+class RealTimeFormatter @Inject constructor() : TimeFormatter {
+  override fun humanReadableClock(duration: Duration): String {
     return if (duration.inWholeHours > 0) {
       "${duration.inWholeHours}:${format(
         duration.inWholeMinutes % 60,
@@ -16,7 +23,7 @@ constructor() {
     }
   }
 
-  fun humanReadableSentence(duration: Duration): String {
+  override fun humanReadableSentence(duration: Duration): String {
     return if (duration.inWholeHours >= 1L) {
       "${humanReadableHours(
         duration.inWholeHours,
@@ -53,4 +60,10 @@ constructor() {
   }
 
   private fun format(n: Long) = n.toString().padStart(2, '0')
+}
+
+@VisibleForTesting(otherwise = VisibleForTesting.NONE)
+class FakeTimeFormatter : TimeFormatter {
+  override fun humanReadableClock(duration: Duration): String = duration.toIsoString()
+  override fun humanReadableSentence(duration: Duration): String = duration.toIsoString()
 }

@@ -134,7 +134,7 @@ constructor(
       .setPriority(NotificationCompat.PRIORITY_HIGH)
       .setContentIntent(intentProvider.openApp)
       .setAutoCancel(true)
-      .setSound(sound?.uri)
+      .setSound(sound?.uri?.toAndroidUri())
       .setOngoing(ongoing)
       .build()
   }

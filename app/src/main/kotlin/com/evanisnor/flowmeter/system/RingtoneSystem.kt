@@ -10,6 +10,7 @@ import com.evanisnor.flowmeter.di.SingleIn
 import com.evanisnor.flowmeter.system.RingtoneSystem.RingtoneSound
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.parcelize.Parcelize
+import java.net.URI
 import javax.inject.Inject
 
 interface RingtoneInitializer {
@@ -20,7 +21,7 @@ interface RingtoneSystem {
   @Parcelize
   data class RingtoneSound(
     val name: String,
-    val uri: Uri,
+    val uri: URI,
   ) : Parcelable
 
   fun getSounds(): List<RingtoneSound>
@@ -71,7 +72,7 @@ constructor() : RingtoneSystem, RingtoneInitializer {
         add(
           RingtoneSound(
             name = getRingtone(position).getTitle(context),
-            uri = getRingtoneUri(position),
+            uri = getRingtoneUri(position).toJavaUri(),
           ),
         )
       }

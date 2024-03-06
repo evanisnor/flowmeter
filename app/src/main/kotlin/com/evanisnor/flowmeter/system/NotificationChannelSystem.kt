@@ -120,7 +120,7 @@ constructor(
     NotificationChannelCompat.Builder(newChannelId, channel.importance)
       .setName(resources.getString(R.string.notification_channel_session))
       .setDescription(resources.getString(R.string.notification_channel_session_description))
-      .setSound(sound, audioAttributes)
+      .setSound(sound?.toAndroidUri(), audioAttributes)
       .setVibrationEnabled(vibrate)
       .apply {
         if (vibrate) {

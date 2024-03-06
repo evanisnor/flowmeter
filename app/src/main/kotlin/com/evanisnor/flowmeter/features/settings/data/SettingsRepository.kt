@@ -2,6 +2,7 @@ package com.evanisnor.flowmeter.features.settings.data
 
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
@@ -16,6 +17,7 @@ import com.evanisnor.flowmeter.system.RingtoneSystem.RingtoneSound
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.net.URI
 import javax.inject.Inject
 
 interface SettingsRepository {
@@ -122,7 +124,7 @@ constructor(
         uri =
         requireNotNull(get(uriKey)) {
           "Failed to retrieve $uriKey from datastore"
-        }.let { Uri.parse(it) },
+        }.let { URI.create(it) },
       )
     } else {
       defaultValue
@@ -135,4 +137,18 @@ constructor(
 
   private fun Preferences.readToggle(key: String, defaultValue: Boolean): Boolean =
     get(booleanPreferencesKey(key)) ?: defaultValue
+}
+
+
+@VisibleForTesting(otherwise = VisibleForTesting.NONE)
+class FakeSettingsRepository : SettingsRepository {
+  private val fakeSound = RingtoneSound("sound", URI.create("test://fake.sound"))
+  override suspend fun saveSessionStartSound(sound: RingtoneSound) = Unit
+  override suspend fun getSessionStartSound(): RingtoneSound = fakeSound
+  override suspend fun saveBreakIsOverSound(sound: RingtoneSound) = Unit
+  override suspend fun getBreakIsOverSound(): RingtoneSound = fakeSound
+  override suspend fun saveBreakIsOverVibrate(vibrate: Boolean) = Unit
+  override suspend fun getBreakIsOverVibrate(): Boolean = false
+  override suspend fun saveDebugQuickBreaks(debugEnableQuickBreaks: Boolean) = Unit
+  override suspend fun getDebugQuickBreaks(): Boolean = false
 }

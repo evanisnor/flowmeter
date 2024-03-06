@@ -1,5 +1,6 @@
 package com.evanisnor.flowmeter.features.flowtimesession.domain
 
+import androidx.annotation.VisibleForTesting
 import com.evanisnor.flowmeter.di.AppScope
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State
 import com.evanisnor.flowmeter.features.flowtimesession.domain.FlowTimeSession.State.Complete
@@ -87,4 +88,20 @@ constructor(
     this < 120.minutes -> 15.minutes
     else -> 20.minutes
   }
+}
+
+@VisibleForTesting(otherwise = VisibleForTesting.NONE)
+class FakeFlowTimeSession : FlowTimeSession {
+
+  var collector: FlowCollector<State>? = null
+    private set
+
+  override suspend fun stop() {
+    collector = null
+  }
+
+  override suspend fun collect(collector: FlowCollector<State>) {
+    this.collector = collector
+  }
+
 }

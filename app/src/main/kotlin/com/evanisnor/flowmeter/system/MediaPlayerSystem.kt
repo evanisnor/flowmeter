@@ -20,7 +20,7 @@ constructor(
 ) : MediaPlayerSystem {
   override fun play(ringtoneSound: RingtoneSystem.RingtoneSound) {
     mediaPlayer.get().apply {
-      setDataSource(context, ringtoneSound.uri)
+      setDataSource(context, ringtoneSound.uri.toAndroidUri())
       prepare()
       setOnCompletionListener {
         release()
