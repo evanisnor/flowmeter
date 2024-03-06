@@ -14,6 +14,7 @@ import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -97,11 +98,11 @@ class FakeFlowTimeSession : FlowTimeSession {
     private set
 
   override suspend fun stop() {
+    collector?.emit(Complete(ZERO, ZERO))
     collector = null
   }
 
   override suspend fun collect(collector: FlowCollector<State>) {
     this.collector = collector
   }
-
 }
