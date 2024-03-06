@@ -81,9 +81,9 @@ constructor(
 
   override suspend fun beginFlowSession() {
     Timber.i("Starting a new Flow session")
-    flowTimeSessionProvider.get().let {
-      currentSession.set(it)
-      collectFromSession(it).let { currentCollectJob.set(it) }
+    flowTimeSessionProvider.get().let { session ->
+      currentSession.set(session)
+      collectFromSession(session).let { currentCollectJob.set(it) }
     }
     attentionGrabber.notifySessionStarted()
   }
@@ -96,9 +96,9 @@ constructor(
       this.breakRecommendation.set(breakRecommendation)
     }
     isTakingABreak.set(true)
-    flowTimeSessionProvider.get().let {
-      currentSession.set(it)
-      collectFromSession(it).let { currentCollectJob.set(it) }
+    flowTimeSessionProvider.get().let { session ->
+      currentSession.set(session)
+      collectFromSession(session).let { currentCollectJob.set(it) }
     }
   }
 
