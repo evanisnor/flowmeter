@@ -100,11 +100,12 @@ constructor(
   }
 
   override suspend fun stop() {
-    currentSession.get().stop()
     if (isTakingABreak.get()) {
       attentionGrabber.clearBreakIsOverNotification()
+      currentSession.get().stop()
       Timber.i("Break is over")
     } else {
+      currentSession.get().stop()
       Timber.i("Flow session is complete")
     }
   }
